@@ -28,6 +28,6 @@ class ErrorMails extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.errors', ['path' => $this->path]);
+        return $this->from('admin@oxdata.ma')->markdown('emails.errors', ['path' => $this->path]);
     }
 }

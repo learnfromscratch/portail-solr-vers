@@ -49,7 +49,7 @@ Route::group(['prefix' => $locale], function () {
         Route::get('/home', 'HomeController@index')->name('home');
 
         Route::get('/search', 'HomeController@search')->name('articles.search');
-        Route::get('/files', 'HomeController@test')->name('articles.test');
+        Route::post('/files', 'HomeController@test')->name('articles.test');
 
         Route::get('/{id}', 'HomeController@show')->name('articles.show');
 

@@ -35,7 +35,7 @@ class Solarium
         $keywordGroups = [];
         foreach ($directory as $files1) {
             $path = $dir.'/'.$files1;
-            $dir1 = array_diff(scandir($path), array('..', '.DS_Store', '.'));
+            $dir1 = array_diff(scandir($path), array('..', '.DS_Store', '.','thefold.lnk'));
             foreach ($dir1 as $file) {
 
                 // $base = basename($file, ".xml");
@@ -87,7 +87,7 @@ class Solarium
         $notIndexed = 0;
         foreach ($directory as $files1) {
             $path = $dir.'/'.$files1;
-            $dir1 = array_diff(scandir($path), array('..', '.DS_Store', '.'));
+            $dir1 = array_diff(scandir($path), array('..', '.DS_Store', '.','thefold.lnk'));
             
             foreach ($dir1 as $file) {
                 //$base = basename($file, ".xml");

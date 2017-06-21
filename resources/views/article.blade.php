@@ -36,7 +36,7 @@
             
                 $highlightedDoc = $highlighting->getResult($document->id);
                 $pdf = $document->document;
-                $pdf = str_replace('/home/harbouj/laravel/app/public', '', $pdf);
+                $pdf1 = str_replace('C:\wamp64\www', '', $pdf);
                 $datesolr = substr($document->SourceDate,0,10);
 
                 $date = date("d-m-Y", strtotime($datesolr));
@@ -89,22 +89,33 @@
             @endif
                 <div class="row w3-margin-bottom">
                     <div class="media {{$class}}">
+                    <!--
                       <div class="media-left">
                         <img src="https://www.heighpubs.org/articleIcons/0423042031704article-icon[1].png" class="media-object" style="width:90px">
                       </div>
+                      -->
                       <div class="media-body">
-                        <h4 class="media-heading w3-xlarge">
+                        <!--<h4 class="media-heading w3-xlarge">
                             {{ $doc }}
                             {{ $doc_en }}
                             {{ $doc_fr }}
                             {{ $doc_ar }}
                         </h4>
-                        <p>
-                            
+                        -->
+                        
+                        
+
+                        <p class="text-center">
+                            <!--
                             {{ $text }}
                             {{ $text_en }}
                             {{ $text_fr }}
-                            {{ $text_ar }}
+                            {{ $text_ar }} -->
+
+<object data="{{$pdf1}}" type="application/pdf" width="800px" height="800px">
+   <p><b>Ce navigateur ne supporte pas la visualisation des pdf</b> Veuillez utilisez un autre navigateur ou télecharger le depuis ce lien : <a href="{{$pdf1}}">Download PDF</a>.</p>
+</object>
+                            
                         </p>
                         <i>Source : {{ $document->Source }}</i><br>
                         <i>Publié le {{ $date }}</i>
@@ -114,7 +125,7 @@
                                 <i class="badge"  >{{$key}}({{$count}})</i>
                             @endforeach
                         </p>
-                        <a href="{{ $pdf }}" target="_blank" class="w3-btn pull-right w3-green">Visualiser pdf</a>
+                        <a href="{{ $pdf1 }}" target="_blank" class="w3-btn pull-right w3-green">Visualiser pdf</a>
                       </div>
                     </div>
                 </div>

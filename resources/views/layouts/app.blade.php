@@ -11,6 +11,8 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Font -->
+    <link href="https://fonts.googleapis.com/css?family=Alegreya" rel="stylesheet">
+
     <link rel='stylesheet prefetch' href='http://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700,900|RobotoDraft:400,100,300,500,700,900'>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -23,6 +25,8 @@
     
     
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+
+<link rel="stylesheet" href="{{ asset('css/bootstrap-tags.css') }}">
     @yield('css')
 
     <!-- Scripts -->.
@@ -44,7 +48,7 @@
     <div id="">
     
 
-           <input type="hidden" id="receiver_id" value="{{$user_id}}" />
+           <input type="hidden" id="receiver_id" value="" />
         <nav class="navbar navbar-default navbar-fixed-top w3-light-gray">
             <div class="container">
             
@@ -122,17 +126,22 @@
     </div>
 
     <!-- Scripts -->
-   
+   <script src="{{ asset('js/bootstrap-tags.min.js') }}"></script>
     <script type="text/javascript">
         $('.input-daterange').datepicker({
-    todayBtn: true,
-    format: 'yyyy-mm-dd'
+        todayBtn: true,
+        format: 'yyyy-mm-dd'
+});
+        $('#dateinput').datepicker({
+            todayHighlight: true,
+             format: 'yyyy-mm-dd'
 });
     </script>
     <script src="https://cdn.jsdelivr.net/sweetalert2/6.4.4/sweetalert2.min.js"></script>
     @include('sweet::alert')
-    <!-- <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script> -->
+    <!-- <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>-->
     <script src="{{ asset('js/app.js') }}"></script>
+    
     
 </body>
 </html>

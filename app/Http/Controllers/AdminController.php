@@ -21,7 +21,7 @@ class AdminController extends Controller
     public function index(\Solarium\Client $client)
     {
         $nbrUser = count(User::all());
-        $notIndexed = (new Solarium($client))->notIndexed();
+        $notIndexed = 10;
     	return view('admin.dashboard', compact('nbrUser', 'notIndexed'));
     }
 

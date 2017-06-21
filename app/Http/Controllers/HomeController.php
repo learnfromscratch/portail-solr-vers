@@ -74,35 +74,7 @@ class HomeController extends Controller
        $query = (new Articles($this->client,$params,$start))->init();
        $helper = $query->getHelper();
         $keywordfacet = [];
-        $user = Auth::user();
        
-            foreach ($user->keywords as $keyword) {
-              $thequery1="";
-              foreach ($Textfields as $value) {
-               $thequery1 .= $value.":".$helper->escapePhrase($keyword->name)." "; 
-            }
-
-              //$query->createFilterQuery($value)->setQuery('Fulltext_fr:'.$helper->escapePhrase($value));
-              $query->setQuery($thequery1);
-               $resultset1 = $this->client->select($query);
-              $count1 = $resultset1->getNumFound();
-              
-                //echo $count1;
-              array_push($keys, $keyword->name);
-              array_push($counts, $count1);
-
-              /*
-                if ($count1 > 0) {
-                  if (empty($_GET['keyword']))
-                     echo '<a href="'.$url.$sign.'keyword='.$value1. '">'.$value1 . ' [' . $count1. ']</a><br/>';
-                    else
-                  echo $value1.' ['.$count1.'] <br>';
-               }
-               */
-            
-        }
-         $numberss = array_combine($keys, $counts);
-         $user_id = Auth::user()->id;
          //dd($resultset);
          //$this->user_id = 
         return view('home', compact('request','resultset', 'folderPdfs', 'facet1', 'facet2', 'facet3','facet4','params','sign','numberss','user_id'));
@@ -136,7 +108,7 @@ class HomeController extends Controller
             $Textfields = ['Title','Title_en', 'Title_fr', 'Title_ar' ,'Fulltext','Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
 
             foreach ($Textfields as $value) {
-                $thequery .= $value.":'".$keyword->name."' ";
+                $thequery .= $value.':("'.$keyword->name.'") ';
 
             }
             
@@ -144,7 +116,7 @@ class HomeController extends Controller
         // Get highlighting component, and apply settings
        $hl = $query->getHighlighting();
         
-        $hl->setFields(array('Title_en', 'Title_fr','Title_ar','Fulltext_en','Fulltext_fr','Fulltext_ar','Fulltext', 'Title'));
+        $hl->setFields(array('Title_en', 'Title_fr','Title_ar','Fulltext_en','Fulltext_fr','Fulltext_ar'));
          $hl->setSnippets(100000); 
          //$hl->setHighlightMultiTerm(true); 
          $hl->setFragSize(2);
@@ -179,49 +151,111 @@ class HomeController extends Controller
 
     public function test(Request $request)
     {
-         $pdf = new ConcatPdf;
-         $pdf->SetFont('dejavusans', '', 12);
-         $pdf->setFiles($request->pdf);
+        //dd($pdfs);
+        $pdfsconcat = [];
+
+        $start = 0;
+        $f = 0;
+        $k = 0;
+        $pdf = new ConcatPdf;
+        
+        $pdf->SetCompression(true);
         $pdf->addPage();
+
+        $pdfs = unserialize($request->pdf);
+        $languages = unserialize($request->language);
+        $titles = unserialize($request->titles); 
+
+        //$pdf->Image('https://opensource.org/files/twitterlogo.png',60,30,90,0,'PNG');
+        $pdf->Image('img/oxdata.jpg',60,30,90,0);
+        $pdf->SetTextColor(48,151,209);
+         $pdf->Ln(100);
+         $pdf->SetFontSize(30);
+        $pdf->Cell(190, 20, 'Revue de presse', 1, 1, 'C');
+        $pdf->SetFontSize(12);
+        //$pdf->addPage();
+        $pdf->addPage();
+        $countlanguage = count(array_unique($languages));
+        $counttitles = $countlanguage + count($pdfs);
+       $j = 0;
+        if(count($pdfs) == 21 and count(array_unique($languages)) == 3){
+            $j = 1;
+            }
+
+        $number = (int) ceil($counttitles / 24) + $j;
+        //dd($number);
+        foreach(array_unique($languages) as $language) {
+            $arraylanguage = [];
+        $keys = array_keys($languages, $language);
+        //dd($$languages);
+        foreach($keys as $key)
+            array_push($arraylanguage, $pdfs[$key]);
+       // dd($arraylanguage);
+        //$pdf->setFiles($arraylanguage);
+        //$pdf->SetAutoPageBreak(true,2);
+        //$pdf->SetDisplayMode(200);
+        // get the article language
+
         //$pdf->SetFont('Times','',12);
         //$link = $pdf->AddLink();
-        $pdf->Cell(200,10,'Table Of Contents',0,1,'C');
-        $pdf->Cell(5,5,'',0,1,'L',false);
-        $pdf->concat2();
-                //$pdf->useTemplate($tplIdx);
-        $pdf->SetTitle('NewsLetter ITELSYS');
-        $pdf->SetKeywords('Fed, simo harbouj');
-        //$page = 1; 
-        $number = ceil(count($request->pdf)/24);
-         $start=$number + 1;
-        for ($pageNo = 1; $pageNo <= count($request->pdf); $pageNo++) { // nombre de documents
-            $pageCount = $pdf->setSourceFile($request->pdf[$pageNo-1]);
+         //$pdf->Ln(20);
+         $pdf->SetTextColor(48,151,209);
+         $pdf->Cell(5, 5, '', 0, 1, 'L', false);
+        $pdf->Cell(190, 10, 'Table Of Contents : '.$language, 1, 1, 'C');
+        
+        //$pdf->Line(10,0,10,0);
+        $pdf->SetTextColor(0,0,0);
+        $pdf->concat2($arraylanguage);
+        //dd($arraylanguage);
+        //$pdf->useTemplate($tplIdx);
+        $pdf->SetTitle('Revue de Presse');
+        //$pdf->SetKeywords('Fed, simo harbouj');
+        //$page = 1;
+        
+        //dd($number);
+        $start = $number + 1 + 1;
+        //$startpage=0;
+        //$k = 0
+        for ($pageNo = 1; $pageNo <= count($arraylanguage); $pageNo++) { // nombre de documents
+            $k++;
+
+            $pageCount = $pdf->setSourceFile($arraylanguage[$pageNo - 1]);
             //$pageCount = $pdf->setSourceFile($value);
-            
-            if ($pageNo == 1){
-                $pdf->links[$pageNo]['p'] = $start;
+
+            if ($k == 1) {
+                $pdf->links[$k]['p'] = $start;
                 $startpage = $pageCount + $start;
-            }
-            else {
-                $pdf->links[$pageNo]['p'] = $startpage;
-                 $startpage = $startpage + $pageCount; 
+            } else {
+                $pdf->links[$k]['p'] = $startpage ;
+                $startpage = $startpage + $pageCount ;
             }
 
-            if (isset($pdf->links[$pageNo])) {     
-              //$convertedString = iconv('ISO-8859-1', 'UTF-8//IGNORE',);
-             // $strp_txt = iconv('UTF-8', 'windows-1252', $request->titles[$pageNo-1]);
-                $pdf->Cell(180,5,$request->titles[$pageNo-1],0,0,'L',false,$pageNo);
-                $pdf->Cell(5,5,$pdf->links[$pageNo]['p'],0,1,'R',false,$pageNo); 
-                $pdf->Cell(5,5,'',0,1,'L',false);
+            if (isset($pdf->links[$k])) {
+                //$convertedString = iconv('ISO-8859-1', 'UTF-8//IGNORE',);
+                // $strp_txt = iconv('UTF-8', 'windows-1252', $titles[$pageNo-1]);
+            if($language == "Arabic") {
+                $pdf->SetFont('dejavusans', '', 12);
+                $pdf->Cell(5, 5, '', 0, 1, 'L', false);
+                $pdf->Cell(5, 5, $pdf->links[$k]['p'], 0, 0, 'L', false, $k);
+                $pdf->Cell(180, 5, $titles[$keys[$pageNo - 1]], 0, 1, 'R', false, $k);
+                
+            } else {
+                $pdf->Cell(5, 5, '', 0, 1, 'L', false);
+                $pdf->Cell(180, 5, $titles[$keys[$pageNo - 1]], 0, 0, 'L', false, $k);
+                $pdf->Cell(5, 5, $pdf->links[$k]['p'], 0, 1, 'R', false, $k);
+                
+            }
             }
         }
-
-        //print_r($pdf->links);
-        $pdf->concat();
-        $pdf->Output('concat.pdf', 'I');
+        foreach($arraylanguage as $lang)
+            array_push($pdfsconcat, $lang);
+      }
+        //dd($pdfsconcat);
+         $pdf->concat($pdfsconcat);
+        $pdf->Output('Revue de Presse.pdf', 'D');
     }
 
-    public static function notifyUser($idArticle, $articleTitle, $pdfPath, $client) {
+    public static function notifyUser($idArticle, $articleTitle, $pdfPath, $client,$articlelanguage) {
       /****************************************************************************************/ 
         // we need to send notification to all concerned client not only the authentified one;
       /***************************************************************************************/
@@ -259,7 +293,8 @@ class HomeController extends Controller
       DB::table('news')->insert([
         'doc_title' => $articleTitle,
         'doc_path' => $pdfPath,
-        'doc_user_id'=> $user->id
+        'doc_user_id'=> $user->id,
+        'article_language' => $articlelanguage
         ]);
       //event(new Alert($user));
     }

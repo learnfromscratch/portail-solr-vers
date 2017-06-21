@@ -19,7 +19,8 @@ use FPDI;
         $this->Cell(0,10,'Page '.$this->PageNo(),0,0,'C');
     }
     
-    public function concat2() {
+    public function concat2($files) {
+        $this->files = $files;
         $j=0;
         foreach($this->files AS $file) {
                   $j++;
@@ -32,12 +33,13 @@ use FPDI;
                 }
             }
         }
-
+        //return $j;
     }
     
-    public function concat()
+    public function concat($files)
     {
         //$lien = Array ( [p] => 7 [y] => 0 [f] => );
+        $this->files = $files;
         foreach($this->files AS $file) {
              
             $pageCount = $this->setSourceFile($file);

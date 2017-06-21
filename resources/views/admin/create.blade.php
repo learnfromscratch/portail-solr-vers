@@ -34,6 +34,7 @@
 @section('css')
 
 	<link rel="stylesheet" type="text/css" href="{{ asset('css/tags.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-tags.css') }}">
 @endsection
 
 @section('content')
@@ -164,7 +165,8 @@
 		                  <label for="tel" class="col-sm-2 control-label">Mots clés</label>
 
 		                  <div class="col-sm-10">
-		                    <div class="tags-input" data-name="keywords[]"></div>
+		                    <!-- <div class="tags-input" data-name="keywords[]"></div> -->
+		                    <input type="text" class="keywords-data"  name="keywordss" value="" data-role="tagsinput" />
 		                  </div>
 		                </div>
 
@@ -184,4 +186,5 @@
 
 @section('javascript')
 	<script type="text/javascript" src="{{ asset('js/tags.js') }}"></script>
+	<script src="{{ asset('js/bootstrap-tags.min.js') }}"></script>
 @endsection

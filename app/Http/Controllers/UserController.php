@@ -69,9 +69,11 @@ class UserController extends Controller
         $user->address = $request['address'];
         $user->abonnement->update(['end_date' => $request['end_date']]);
 
-        $request['keywords'] = explode( ',', $request['keywords'][0] );
+        //$request['keywords'] = explode( ',', $request['keywords'][0] );
+        
+        $keywordss = explode(',', $request->keywordss);
         $keywords = [];
-        foreach ($request['keywords'] as $val)
+        foreach ($keywordss as $val)
         {
             $keyword = Keyword::firstOrCreate(['name' => $val]);
             array_push($keywords, $keyword->id);

@@ -74,9 +74,12 @@ class RegisterController extends Controller
             'address' => $data['address'],
         ]);
 
-        $data['keywords'] = explode( ',', $data['keywords'][0] );
+
+
+        $keywordss = explode(',', $data['keywordss']);
+        //$data['keywords'] = explode( ',', $data['keywords'][0] );
         $keywords = [];
-        foreach ($data['keywords'] as $val)
+        foreach ($keywordss as $val)
         {
             $keyword = Keyword::firstOrCreate(['name' => $val]);
             array_push($keywords, $keyword->id);

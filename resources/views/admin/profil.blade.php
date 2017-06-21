@@ -34,7 +34,7 @@
 @section('css')
 
 	<link  rel="stylesheet" href="{{ asset('css/tags.css') }}">
-    <link rel="stylesheet" type="text/css" href="/css/bootstrap-tagsinput.css">
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-tags.css')}}">
 @endsection
 
 @section('content')
@@ -231,11 +231,13 @@
 				                  <label for="tel" class="col-sm-2 control-label">Mots clés</label>
 				                
 				                  <div class="col-sm-10">
-				                    <div class="tags-input" data-name="keywords[]"></div>
+				                    <!-- <div class="tags-input" data-name="keywords[]"></div> -->
+				                   @php $keys = ""; @endphp
 				                    @foreach($user->keywords as $key)
-
+				                    	@php $keys .= $key->name.","; @endphp
 				                    @endforeach
-				                    <input type="text" class="keywords-data"  value="" data-role="tagsinput" />
+				                    
+				                    <input type="text" class="keywords-data"  name="keywordss" value="{{$keys}}" data-role="tagsinput" />
 				                  </div>
 				                </div>
 							</div>
@@ -269,7 +271,8 @@
 @endsection
 
 @section('javascript')
-<script src="{{ asset('js/bootstrap-tagsinput.min.js') }}"></script>
+<script src="js/bootstrap-tagsinput.min.js"></script>
+<script src="{{ asset('js/bootstrap-tags.min.js') }}"></script>
 
 	<script type="text/javascript">
 		var keywords = new Array();

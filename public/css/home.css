@@ -1,9 +1,10 @@
 body, html {
 	font-family: 'RobotoDraft', 'Roboto', sans-serif;
+	
 }
 
 h1, h2, h3, h4, h5, p, label {
-	font-weight: 300;
+	font-weight: 400;
 }
 
 .input-group {
@@ -61,17 +62,29 @@ nav[aria-label="Page navigation"] {
 	margin-top: 10px;
 }
 .articles {
-	float:right;
-	width: 77%;
-	position: relative;
-	margin-top: 11px;
+	    float: right;
+    width: 70%;
+    position: relative;
+    margin-top: 11px;
+    /* left: -48px; */
+    /* right: 332px;*/
+}
+.widget1 {
+	width: 300px;
+    /*height: 200px;*/
+    float: right;
+    position: relative;
+    right: -693px;
+    border: 1px dotted;
+    background: #f1f1f1;
+    padding: 10px;
 }
 .widget {
 	float: left;
     border: 1px dotted;
     background: #f1f1f1;
     padding: 10px;
-    width: 20%;
+    width: 26%;
 }
 
 .input-date {
@@ -99,7 +112,7 @@ nav[aria-label="Page navigation"] {
 .download {
 	    position: absolute;
     top: -19px;
-    right: -14px;
+    /*right: -14px;*/
 }
 
 .widget i {
@@ -111,11 +124,11 @@ nav[aria-label="Page navigation"] {
     color: #009f9f;
     font-style: italic;
 }
-.widget .keywords, .widget .source, .widget .language {
+.widget .keywords, .widget .source, .widget .language, .widget1 .themes, .widget1 .calendrier {
 	
     padding-bottom: 12px;
 }
-.widget h4 {
+.widget h4, .widget1 h4 {
 	    
     border-bottom: 1px dotted;
     padding-bottom: 9px;
@@ -143,18 +156,19 @@ nav[aria-label="Page navigation"] {
   background: #009f9f; /* WebKit/Blink Browsers */
   color: white;
 }
-
+/*
 .widget button{
-	    background: none;
+	background: none;
     border: none;
 }
+*/
 .widget .closes {
 	color: white;
 }
 
-.search-form .search button{
+.search-form .search button {
 
-	        /* float: right; */
+    /* float: right; */
     /* display: inline; */
     /* float: right; */
     /* display: inline; */
@@ -163,7 +177,32 @@ nav[aria-label="Page navigation"] {
     /* padding: 10px; */
     width: 43px;
     height: 46px;
-} 
+}
 .media:first-child {
     margin-top: 12px;
+}
+.big {
+	font-size: 30px;
+}
+.small {
+	font-size: 18px;
+}
+.micro {
+	font-size: 10px;
+}
+
+.medium {
+	font-size: 25px;
+}
+.recherche {
+	float: right;
+    position: relative;
+    bottom: 32px;
+    right: 100px;
+}
+.bootstrap-tagsinput {
+    width: 567px;
+}
+.bootstrap-tagsinput input {
+    width: 560px;
 }

@@ -18,6 +18,7 @@ class CreateNewsTable extends Migration
             $table->string('doc_title');
             $table->string('doc_path');
             $table->integer('doc_user_id');
+            $table->string('article_language');
             $table->timestamps();
         });
     }

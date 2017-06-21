@@ -84,8 +84,8 @@
                     <div class="right">
                         <div class="overlay"></div>
                         <div class="content text">
-                            <h1 class="heading">Portail de presse monitoring</h1>
-                            <p>by OXDATA-ITELSYS</p>
+                            <h1 class="heading">Portail de surveillance des médias</h1>
+                            <p>Powered by OXDATA</p>
                         </div>
                     </div>
                     <div class="clearfix"></div>
