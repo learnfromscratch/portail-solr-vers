@@ -43,7 +43,7 @@
                         
                             <div class="form-group">
                                 <label for="recipient-name" class="form-control-label">All these words:</label>
-                                <input data-role="tagsinput" type="text" class="form-control" id="recipient-name" name="allthiswords" value="{{array_key_exists('allthiswords',$params) ? $params['allthiswords'] : ''}}" placeholder='les mots ici seront séparés par AND'>
+                                <input data-role="tagsinput" type="text" class="form-control" id="recipient-name" name="allthiswords" value="{{array_key_exists('allthiswords',$params) ? $params['allthiswords'] : ''}}" placeholder='Sépare les mots par virgule (AND)'>
                             </div>
                             <div class="form-group">
                                 <label for="message-text" class="form-control-label">This exact word or phrase:</label>
@@ -51,12 +51,12 @@
                             </div>
                             <div class="form-group">
                                 <label for="message-text" class="form-control-label">Any of these words:</label>
-            <input type="text" class="form-control " data-role="tagsinput" id="recipient-name" placeholder="Type OR between all the words you want:   miniature OR standard" name="orwords" value="{{array_key_exists('orwords',$params) ? $params['orwords'] : ''}}">
+            <input type="text" class="form-control " data-role="tagsinput" id="recipient-name" placeholder="Sépare les mots par virgule (OR)" name="orwords" value="{{array_key_exists('orwords',$params) ? $params['orwords'] : ''}}">
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="message-text" class="form-control-label">None of these words:</label>
-                                <input type="text" data-role="tagsinput" class="form-control redtags" name="noneofthis" id="recipient-name" value="{{array_key_exists('noneofthis',$params) ? $params['noneofthis'] : ''}}">
+                                <input type="text" data-role="tagsinput" class="form-control redtags" name="noneofthis" placeholder="Sépare les mots par virgule (exclut)" id="recipient-name" value="{{array_key_exists('noneofthis',$params) ? $params['noneofthis'] : ''}}">
 
     
                             

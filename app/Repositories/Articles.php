@@ -146,6 +146,9 @@ class Articles
 		$excludequery = '';
 		$andquery = '';
 		$allquery='';
+		$theorquery = '';
+		$orquery='';
+		$after='';
 
 		if (isset($this->params['allthiswords'])) { 
 			$array = explode(",",$this->params['allthiswords']);
@@ -156,12 +159,26 @@ class Articles
 			}
 			$thequery1 = substr($thequery,0,-4);
 			//dd($thequery1);
-			$andquery .= "(".$thequery1.") ";
+			$andquery = "(".$thequery1.") ";
 			
+			$after = " AND ";
 
 			//dd($andquery);
 
 			//$query->createFilterQuery('allthiswords')->setQuery($andquery);
+		}
+
+		if(isset($this->params['orwords'])) {
+			$array = explode(",",$this->params['orwords']);
+
+			foreach($array as $value){
+			
+		  		$theorquery .= '"'.$value.'" ';
+			}
+
+			$orquery = $after."(".$theorquery.") ";
+			
+
 		}
 
 		if (isset($this->params['noneofthis'])) {
@@ -183,10 +200,10 @@ class Articles
 			//$query->createFilterQuery('noneofthis')->setQuery($excludequery);
 		}
 
-		if(!empty($this->params['noneofthis']) OR !empty($this->params['allthiswords'])) {
+		if(!empty($this->params['noneofthis']) OR !empty($this->params['allthiswords']) OR !empty($this->params['orwords'])) {
 			
 			foreach ($Textfields as $field) {
-		  		$allquery .= $field.":(".$andquery."".$excludequery.") ";
+		  		$allquery .= $field.":(".$andquery."".$orquery."".$excludequery.") ";
 			}
 			//dd($allquery);
 			$query->setQuery($allquery);
