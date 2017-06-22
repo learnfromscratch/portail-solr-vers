@@ -24,6 +24,17 @@ class AdminController extends Controller
         $notIndexed = 10;
     	return view('admin.dashboard', compact('nbrUser', 'notIndexed'));
     }
+    
+    public function delete(\Solarium\Client $client) {
+        $update = $client->createUpdate();
+
+        // add the delete id and a commit command to the update query
+        $update->addDeleteById('170208TestWP114');
+        $update->addCommit();
+
+        // this executes the query and returns the result
+        $result = $client->update($update);
+    }
 
     public function indexing(\Solarium\Client $client)
     {

@@ -12,7 +12,7 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('users')->insert(['cin' => 'R0252052', 'name' => 'Oxdata Admin', 'email' => 'test@oxdata.ma',
+        DB::table('users')->insert(['cin' => 'R0252052', 'name' => 'Oxdata Admin', 'email' => 'admin@oxdata.ma',
         	'password' => bcrypt('oxdata'), 'role' => 'admin', 'tel' => '0604135679', 'address' => 'Hassan, Rabat', 'created_at' => Carbon::now()
         	]);
         DB::table('users')->insert(['cin' => '123456', 'name' => 'Mailtrap', 'email' => 'ibarry-b54e2f@inbox.mailtrap.io', 'role' => 'admin',

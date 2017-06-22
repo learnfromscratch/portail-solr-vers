@@ -86,7 +86,17 @@ class HomeController extends Controller
         $folderPdfs = "Articles";
         $keys = [];
         $counts = [];
-        $resultset = (new Articles($this->client,null,1))->show($request->id);   
+        $params = $request->all();
+        if (empty($params))
+            $sign = "?";
+        else
+            $sign="&";
+        $resultset = (new Articles($this->client,$params,1))->show($request->id);  
+        $facet1 = $resultset->getFacetSet()->getFacet('language');
+        $facet2 = $resultset->getFacetSet()->getFacet('author');
+        $facet3 = $resultset->getFacetSet()->getFacet('source');
+        $facet4 = $resultset->getFacetSet()->getFacet('date');
+ 
         $user = Auth::user();
 
         foreach($user->keywords()->get() as $keyword) {
@@ -145,7 +155,7 @@ class HomeController extends Controller
         }
         $numbers = array_combine($keys, $counts);
         $user_id = Auth::user()->id;
-        return view('article', compact('resultset', 'folderPdfs','numbers','user_id'));
+        return view('article', compact('resultset', 'folderPdfs','numbers','user_id', 'facet1', 'facet2', 'facet3','facet4','params','sign'));
     }
 
 
@@ -170,10 +180,13 @@ class HomeController extends Controller
         $pdf->Image('img/oxdata.jpg',60,30,90,0);
         $pdf->SetTextColor(48,151,209);
          $pdf->Ln(100);
-         $pdf->SetFontSize(30);
+         $pdf->SetFont('times','I',30);
         $pdf->Cell(190, 20, 'Revue de presse', 1, 1, 'C');
         $pdf->SetFontSize(12);
+        $pdf->Ln(120);
+        $pdf->Cell(190, 20, 'Envoyé le :'.date("d-m-Y"), 0, 1, 'C');
         //$pdf->addPage();
+         $pdf->SetFont('times');
         $pdf->addPage();
         $countlanguage = count(array_unique($languages));
         $counttitles = $countlanguage + count($pdfs);

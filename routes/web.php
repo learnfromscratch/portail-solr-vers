@@ -62,7 +62,7 @@ Route::group(['prefix' => $locale], function () {
             });
 
         Route::get('/admin/dashboard', 'AdminController@index')->name('dashboard');
-        
+        Route::get('/admin/dashboards', 'AdminController@delete')->name('dashboard1');
         /*
         Route::get('/', function($params){
             unset($params['language']);
