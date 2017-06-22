@@ -100,7 +100,8 @@
 -->     <div class="article-widget">
         <div class="widget">
         <em class="number-articles">{{ __('Number of articles : ') }}<i>{{ $resultset->getNumFound() }} </i></em>
-            @if(!empty($params['data']))
+            @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords'])
+            OR !empty($params['orwords']))
             
             <br><br>
             <select id="comboA" onchange="getComboA(this)" class="form-control">
@@ -144,12 +145,10 @@
         <div class="source">  
             <h4>{{ __('Filter by Source :') }}</h4><br>
             @foreach ($facet3 as $value => $count)
-               @if (empty($params['source']))
+               
 
                     <a href="{{ route('roots', $params)}}{{$sign}}source={{$value}}">{{ $value}}</a><i>{{$count}}</i><br>
-                 @elseif ($params['source'] == $value)
-                    <p class="actives">{{ $value}}<i>{{$count}}</i></p><br>
-                @endif
+                 
             @endforeach
         </div>
         @php
@@ -279,7 +278,7 @@
                         <i>{{ __('Source : ') }}<a href="{{ route('roots', $params)}}{{$sign}}source={{$document->SourceName}}">{{ $document->SourceName }}</a></i><br>
                         
                         <i>{{ __('Author : ') }}<a href="{{ route('roots', ['author' => urlencode($document->Author)]) }}">{{ $document->Author }}</a></i>
-                        @if(!empty($params['data']))
+                        @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
                             <br><i>Score {{ $document->score }}</i>
                         @endif
                         <br><a href="{{ $pdf1 }}" target="_blank" class="w3-btn w3-green">{{ __('View PDF') }}</a>
@@ -413,16 +412,16 @@
         var value = selectObject.value;
         
           
-        //console.log( getParameterByName('data'));
+        console.log(value);
 
-        window.location =  '?data='+getParameterByName('data')+'&sort='+value;
+        window.location =  '?data='+getParameterByName('data')+'&allthiswords='+getParameterByName('allthiswords')+'&noneofthis='+getParameterByName('noneofthis')+'&orwords='+getParameterByName('orwords')+'&sort='+value;
     }
     function getParameterByName(name, url) {
         if (!url) url = window.location.href;
         name = name.replace(/[\[\]]/g, "\\$&");
         var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
             results = regex.exec(url);
-        if (!results) return null;
+        if (!results) return '';
         if (!results[2]) return '';
         return decodeURIComponent(results[2].replace(/\+/g, " "));
 }

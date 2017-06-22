@@ -127,8 +127,8 @@ class Articles
 			$query->addSort('score', $query::SORT_DESC);
 		}
 
-		if (empty($this->params['data']))
-			$query->addSort('SourceDate', $query::SORT_DESC);
+		if (empty($this->params['data']) AND empty($this->params['noneofthis']) AND empty($this->params['allthiswords']) AND empty($this->params['orwords']))
+				$query->addSort('SourceDate', $query::SORT_DESC);
 		
 		if (isset($this->params['fromdate'])) { 
 			//and isset($this->params['todate'])) {
@@ -136,9 +136,6 @@ class Articles
 			$query->createFilterQuery('fromdate')->setQuery('SourceDate:"'.$fromdate.'"');
 			//$todate = $this->params['todate'].'T00:00:00Z';
 			//$query->createFilterQuery('fromdate')->setQuery('SourceDate:['.$fromdate.' TO '.$todate.']');
-		}
-		if (isset($this->params['allthiswords'])) {
-
 		}
 
 		$thequery = '';
@@ -226,7 +223,48 @@ class Articles
 		// this executes the query and returns the result
 		return $resultset = $this->client->select($query);
 	}
+	public function all() {
+		// get the connected User
+		$user = Auth::user();
 
+		// construct the query for searcg
+    	$querySearched = "";
+
+		
+
+		
+		// get a select query instance
+		$query = $this->client->createSelect();
+		$this->client->getPlugin('postbigrequest');
+
+		$helper = $query->getHelper();
+		foreach($user->keywords()->get() as $keyword)
+		{
+			$querySearched .= $helper->escapePhrase($keyword->name);
+		}
+		//dd($querySearched);
+		$keywordsquery = "";
+		$Textfields = ['Title_en', 'Title_fr', 'Title_ar' ,'Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
+
+		foreach ($Textfields as $value) {
+		  $keywordsquery .= $value.":(".$querySearched.") ";
+		}
+
+		$query->createFilterQuery('filterkeywords')->setQuery($keywordsquery);
+		
+		$query->setFields([
+			'id',
+			'Title_en','Title_fr', 'Title_ar',
+			'Fulltext_en','Fulltext_fr','Fulltext_ar',
+			'document', 'Source','SourceName','ArticleLanguage', 'SourceDate','Author','score']);
+		$facetSet = $query->getFacetSet();
+		$facetSet->createFacetField('language')->setField('ArticleLanguage');
+		$facetSet->createFacetField('author')->setField('Author');
+		$facetSet->createFacetField('source')->setField('SourceName');
+		$facetSet->createFacetField('date')->setField('SourceDate');
+		$facetSet->setMinCount(1);
+		return $resultset = $this->client->select($query);
+	}
 
 	public function show($request)
 	{

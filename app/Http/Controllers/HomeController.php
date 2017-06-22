@@ -66,6 +66,7 @@ class HomeController extends Controller
         $folderPdfs = "Articles";
 
         $resultset = (new Articles($this->client,$params,$start))->index();
+        $result = (new Articles($this->client,$params,$start))->all();
         $facet1 = $resultset->getFacetSet()->getFacet('language');
         $facet2 = $resultset->getFacetSet()->getFacet('author');
         $facet3 = $resultset->getFacetSet()->getFacet('source');

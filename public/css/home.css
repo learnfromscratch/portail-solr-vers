@@ -206,3 +206,9 @@ nav[aria-label="Page navigation"] {
 .bootstrap-tagsinput input {
     width: 560px;
 }
+
+/*  delete later*/
+
+object {
+    background: red;
+}
