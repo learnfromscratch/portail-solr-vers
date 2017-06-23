@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <div class="container">
+    <div class="container-fluid">
         <div class="row col-lg-12">
             <form class="search-form" role="search" action="{{ route('roots') }}" method="get">
                 <div class="input-group search">
@@ -87,6 +87,108 @@
                     $class = 'arabic';
                 @endphp
             @endif
+            <div class="widget">
+        <em class="number-articles">{{ __('Number of articles : ') }}<i>{{ $resultset->getNumFound() }} </i></em>
+            @if(!empty($params['data']))
+            
+            <br><br>
+            <select id="comboA" onchange="getComboA(this)" class="form-control">
+                @if(!empty($params['sort']) and $params['sort'] == 'pertinence')
+                    <option value='pertinence' selected="selected">Relevance</option>
+                @elseif(empty($params['sort']) or $params['sort'] != 'pertinence')
+                    <option value='pertinence'>Relevance</option>
+                @endif
+
+                @if(!empty($params['sort']) and $params['sort'] == 'date')
+                    <option value='date' selected="selected">Newest</option>
+                @elseif(empty($params['sort']) or $params['sort'] != 'date')
+                    <option value='date'>Newest</option>
+                @endif
+                
+            </select>
+        @endif
+        <!-- This is custom facade, so I have to code everything-->
+        <div class="keywords">
+            @php
+
+                 $user = Auth::user();
+            @endphp
+        </div>
+        <div class="language">       
+            <h4>{{ __('Filter by Language :') }}</h4><br>
+            @foreach ($facet1 as $value => $count)
+                @if (empty($params['language']))
+                <a href="{{ route('roots', $params) }}{{$sign}}language={{$value}}">{{ $value}}<i>{{$count}}</i></a><br>
+                @elseif ($params['language'] == $value)
+                     <p class="actives">
+                    {{ $value}}
+                     <a href="#" class="closes">
+                        <i class="fa fa-times-circle" aria-hidden="true"></i>
+                     </a>
+                     
+                    </p><br>
+                @endif
+            @endforeach
+        </div>
+        <div class="source">  
+            <h4>{{ __('Filter by Source :') }}</h4><br>
+            @foreach ($facet3 as $value => $count)
+               @if (empty($params['source']))
+
+                    <a href="{{ route('roots', $params)}}{{$sign}}source={{$value}}">{{ $value}}</a><i>{{$count}}</i><br>
+                 @elseif ($params['source'] == $value)
+                    <p class="actives">{{ $value}}<i>{{$count}}</i></p><br>
+                @endif
+            @endforeach
+        </div>
+        @php
+            $parameters = [];
+            foreach($params as $key => $parm) {
+                $parameters[$key] = $parm;
+            }
+            //dd($parameters);
+            $choixdate = '';
+            $signs = '?';
+            if(isset($params['fromdate']))
+            {
+                $choixdate = $params['fromdate'];
+                unset($params['fromdate']);
+            }
+
+            if(count($params) > 0) {
+                $signs = "&";
+            }
+        @endphp
+
+        <div class="days">
+            <h4>5 Derniers Jours</h4>
+
+            @php $today = date("Y-m-d"); @endphp
+            @for($i = 0 ; $i < 5; $i++) 
+                @if($i == 0)
+                    <a href="{{ route('roots', $params) }}{{$signs}}fromdate={{$today}}"> Aujourd'hui</a><br>
+                @elseif ($i == 1)
+                    <a href="{{ route('roots', $params) }}{{$signs}}fromdate={{date('Y-m-d', strtotime($today. '  -'.$i.' day' ))}}"> Hier</a><br>
+                @else
+                    <a href="{{ route('roots', $params) }}{{$signs}}fromdate={{date('Y-m-d', strtotime($today. '  -'.$i.' day' ))}}"> {{date("d-m-Y", strtotime($today. "  -".$i." day" ))}}</a><br>
+                     
+                @endif
+                
+            @endfor
+
+        </div>
+        <br>
+        <div class="calendrier">
+        <h4>Calendrier</h4><br>
+            <form class="form-inline" method="get" action="{{ route('roots', $params)}}">
+               <input type="text" name="fromdate" class="form-control" id="dateinput" placeholder="Calendrier" value="{{$choixdate}}" >
+                <button type="submit" class="btn btn-primary"><i class="fa fa-search fa-fw" aria-hidden="true"></i></button> 
+
+            </form>
+            <br>
+    </div>
+        
+        </div>
                 <div class="row w3-margin-bottom">
                     <div class="media {{$class}}">
                     <!--
@@ -111,10 +213,8 @@
                             {{ $text_en }}
                             {{ $text_fr }}
                             {{ $text_ar }} -->
+<embed src="{{$pdf1}}#page=1&zoom=150" width="800" height="500">
 
-<object data="{{$pdf1}}" type="application/pdf" width="800px" height="800px">
-   <p><b>Ce navigateur ne supporte pas la visualisation des pdf</b> Veuillez utilisez un autre navigateur ou télecharger le depuis ce lien : <a href="{{$pdf1}}">Download PDF</a>.</p>
-</object>
                             
                         </p>
                         <i>Source : {{ $document->Source }}</i><br>

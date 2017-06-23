@@ -6,6 +6,7 @@
 			<nav>
 				<ul class="nav">
 					<li><a href="{{ route('dashboard') }}" class="active"><i class="lnr lnr-home"></i> <span>Tableau de bord</span></a></li>
+
 					<li>
 						<a href="{{ route('users.all') }}"><i class="lnr lnr-pencil"></i> <span>Gestion des clients</span></a>
 					</li>
@@ -96,6 +97,8 @@
 					<div class="right">
 						<button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
 						<button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
+
+						<a href="{{route('dashboard1')}}">Delete documents</a>
 					</div>
 				</div>
 				<div class="panel-body">
