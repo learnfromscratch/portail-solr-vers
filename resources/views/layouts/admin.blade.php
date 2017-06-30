@@ -1,45 +1,129 @@
-@extends ('layouts.app')
+<!doctype html>
+<html lang="en">
 
-@section('css')
+<head>
+  <title>Espace administration du portail</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <!-- VENDOR CSS -->
+  <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/assets/vendor/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/vendor/linearicons/style.css">
+  <link rel="stylesheet" href="/assets/vendor/toastr/toastr.min.css">
+  <!-- MAIN CSS -->
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <!-- FOR DEMO PURPOSES ONLY. You should remove this in your project -->
+  <link rel="stylesheet" href="/assets/css/demo.css">
+  <link rel="stylesheet" type="text/css" href="/css/iziToast.min.css">
 
-@endsection
+  <!-- GOOGLE FONTS -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700" rel="stylesheet">
+  <!-- ICONS -->
+  <link rel="icon" type="image/png" sizes="96x96" href="/assets/img/favicon.png">
 
-@section('content')
-    <div class="container-fluid margin">
-      <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar w3-light-gray w3-padding-32">
-          <ul class="nav nav-sidebar">
-            <li class="active">
-              <a href="{{ route('dashboard') }}"><i class="fa fa-bar-chart fa-lg fa-fw w3-text-blue" aria-hidden="true"></i> Tableau de bord</a>
-            </li>
-            <li>
-              <a data-toggle="collapse" data-target="#second">
-                <i class="fa fa-pencil fa-lg fa-fw w3-text-blue" aria-hidden="true"></i> Gestion des clients 
-                <i class="fa fa-angle-left fa-fw w3-text-blue"></i>
+  @yield('css')
+
+</head>
+
+<body class="layout-fullwidth">
+  <!-- WRAPPER -->
+  <div id="wrapper">
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="brand">
+        <a href="{{ route('home') }}">{{ config('app.name', 'Laravel') }}</a>
+      </div>
+      <div class="container-fluid">
+        <div id="navbar-menu">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown hidden-xs">
+              <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
+                <i class="lnr lnr-alarm"></i>
+                @if (count(Auth::user()->unreadNotifications))
+                  <span class="badge bg-danger">{{ count(Auth::user()->unreadNotifications) }}</span>
+                @endif
               </a>
-              <ul class="nav nav-second-level collapse" id="second">
+              <ul class="dropdown-menu notifications">
+                @foreach (Auth::user()->unreadNotifications as $notification)
+                  <li>
+                    <a href="#" class="notification-item"><span class="dot bg-{{$notification->type}}"></span>
+                      {{ $notification->data['info'] }}<br>
+                      <i>{{ $notification->created_at->toFormattedDateString() }}</i>
+                    </a>
+                  </li>
+                @endforeach
+                <li><a href="#" class="more">Afficher tous</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <span>{{ Auth::user()->name }}</span> <i class="icon-submenu lnr lnr-chevron-down"></i>
+              </a>
+              <ul class="dropdown-menu">
                 <li>
-                    <a href="{{ route('list') }}"><i class="fa fa-list fa-fw w3-text-blue"></i> Liste des clients</a>
-                </li>
-                <li>
-                    <a href="{{ route('create') }}"><i class="fa fa-plus fa-fw w3-text-blue"></i> Ajouter un client</a>
+                  <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="lnr lnr-exit"></i> 
+                    <span>Déconnexion
+                  </a>
+
+                  <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                      {{ csrf_field() }}
+                  </form>
                 </li>
               </ul>
             </li>
-            <li>
-              <a href="#">
-                <i class="fa fa-list fa-lg fa-fw w3-text-blue" aria-hidden="true"></i> Listes des articles
-              </a>
-            </li>
           </ul>
         </div>
-        
-        <div class="col-sm-9 col-md-10">
-        	@yield('page')
+      </div>
+    </nav>
+    <!-- END NAVBAR -->
+    <!-- LEFT SIDEBAR -->
+    @yield('leftSidebar')
+    <!-- END LEFT SIDEBAR -->
+
+    <div class="main">
+      <!-- MAIN CONTENT -->
+      <div class="main-content">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+              @yield('content')
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
-@endsection
+  <!-- Javascript -->
+  <script src="/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="/assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+  <script src="/assets/vendor/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+  <script src="/assets/vendor/toastr/toastr.min.js"></script>
+  <script src="/assets/scripts/klorofil-common.js"></script>
+  <script type="text/javascript" src="/js/iziToast.min.js"></script>
+
+  @if (Session::has('success'))
+    <script type="text/javascript">
+      iziToast.success({
+          title: 'OK',
+          message: '<?php echo Session::get('success') ?>',
+          position: 'topRight',
+      });
+    </script>
+  @endif
+
+  @if (Session::has('error'))
+    <script type="text/javascript">
+      iziToast.error({
+          title: 'Erreur',
+          message: '<?php echo Session::get('error') ?>',
+          position: 'topRight',
+      });
+    </script>
+  @endif
+
+  @yield('javascript')
+
+</body>
+</html>

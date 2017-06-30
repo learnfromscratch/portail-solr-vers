@@ -12,6 +12,8 @@ use App\User;
 use  Illuminate\Support\Facades\Redis;
 use App\Events\Alert;
 use Illuminate\Support\Facades\DB;
+use App\Theme;
+use App\Repositories\GetKeywords;
 
 
 class HomeController extends Controller
@@ -26,7 +28,7 @@ class HomeController extends Controller
     public function __construct(\Solarium\Client $client)
     {
         $this->middleware('auth');
-        $this->middleware('abonnement');
+        //$this->middleware('abonnement');
         $this->client = $client;
         
     }
@@ -66,9 +68,9 @@ class HomeController extends Controller
         $folderPdfs = "Articles";
 
         $resultset = (new Articles($this->client,$params,$start))->index();
-        $result = (new Articles($this->client,$params,$start))->all();
+        //$result = (new Articles($this->client,$params,$start))->all();
         $facet1 = $resultset->getFacetSet()->getFacet('language');
-        $facet2 = $resultset->getFacetSet()->getFacet('author');
+        //$facet2 = $resultset->getFacetSet()->getFacet('author');
         $facet3 = $resultset->getFacetSet()->getFacet('source');
         $facet4 = $resultset->getFacetSet()->getFacet('date');
 
@@ -76,9 +78,60 @@ class HomeController extends Controller
        $helper = $query->getHelper();
         $keywordfacet = [];
        
+       $user = Auth::user();
+        if ($user->groupe->id === 1) {
+            $themes = Theme::all();
+        } 
+        elseif ($user->role->name === 'Admin') {
+            $themes = $user->groupe->themes;
+        }
+        
+        else {
+            $themes = $user->groupe->themes;
+        }
+
+        //$query1 = $this->client->createSelect();
+        /*
+        $query->setFields([
+            'Title_en','Title_fr', 'Title_ar',
+            'Fulltext_en','Fulltext_fr','Fulltext_ar']);
+        */
+
+        
+        $Textfields = ['Title_en', 'Title_fr', 'Title_ar','Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
+
+        $keywor = new GetKeywords($user);
+
+        $keyss = [];
+        $count = [];
+        foreach($themes as $theme) {
+            $thequery = "";
+            
+            $keywos = $keywor->getKeywordsByTheme($theme);
+            
+            foreach ($Textfields as $value) {
+                $thequery .= $value.':('.$keywos.') ';
+            }
+
+            
+            $query->setQuery($thequery);
+            $resultset2 = $this->client->select($query);
+            $counts = $resultset2->getNumFound();
+
+
+            array_push($keyss, $theme->name);
+            array_push($count, $counts);
+
+        }
+
+         $numbers = array_combine($keyss, $count);
+
+        //dd($numbers);
+        
+
          //dd($resultset);
          //$this->user_id = 
-        return view('home', compact('request','resultset', 'folderPdfs', 'facet1', 'facet2', 'facet3','facet4','params','sign','numberss','user_id'));
+        return view('home', compact('request','resultset','themes', 'folderPdfs', 'facet1', 'facet2', 'facet3','facet4','params','sign','numbers','user_id'));
     }
 
 
@@ -99,14 +152,19 @@ class HomeController extends Controller
         $facet4 = $resultset->getFacetSet()->getFacet('date');
  
         $user = Auth::user();
+         foreach ($themes as $theme) {
+            // array of keywords
+            $keywords = getkeywords($theme);
+            
+        }
 
         foreach($user->keywords()->get() as $keyword) {
             $countkey = 0;
             $query = $this->client->createSelect();
         
             $query->setFields([
-            'Title','Title_en','Title_fr', 'Title_ar',
-            'Fulltext','Fulltext_en','Fulltext_fr','Fulltext_ar']);
+            'Title_en','Title_fr', 'Title_ar',
+            'Fulltext_en','Fulltext_fr','Fulltext_ar']);
         
 
         // get the dismax component and set a boost query
@@ -170,7 +228,7 @@ class HomeController extends Controller
         $k = 0;
         $pdf = new ConcatPdf;
         
-        $pdf->SetCompression(true);
+        //$pdf->SetCompression(true);
         $pdf->addPage();
 
         $pdfs = unserialize($request->pdf);

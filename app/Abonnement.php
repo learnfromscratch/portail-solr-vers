@@ -10,7 +10,7 @@ class Abonnement extends Model
         'start_date', 'end_date',
     ];
 
-    public function user()
+    public function groupe()
     {
     	return $this->belongsTo('App\User');
     }

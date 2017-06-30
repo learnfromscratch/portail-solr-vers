@@ -15,7 +15,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'cin', 'name', 'email', 'password','tel', 'address',
+        'name', 'email', 'password', 'groupe_id', 'role_id', 'sous_groupe_id'
     ];
 
     /**
@@ -27,22 +27,22 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    /**
-     * The keywords that belong to the user.
-     */
-    public function keywords()
+    public function groupe()
     {
-        return $this->belongsToMany('App\Keyword');
+        return $this->belongsTo('App\Groupe');
     }
 
-    public function abonnement()
+    public function sousGroupe()
     {
-        return $this->hasOne('App\Abonnement');
+        return $this->belongsTo('App\SousGroupe');
     }
 
-    public function activities()
+    public function role()
     {
-        return $this->hasMany('App\Activity');
+        return $this->belongsTo('App\Role');
     }
 
+    public function newsletter() {
+        return $this->hasOne('App\Newsletter');
+    }
 }

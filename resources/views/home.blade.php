@@ -197,6 +197,14 @@
             </form>
             <br>
     </div>
+
+    <div class="themes">
+    <h4>Themes</h4><br>
+    @foreach($numbers as $subject => $sub)
+        <a class="mdl-navigation__link" href="">{{ $subject }}</a> ({{$sub}})
+    @endforeach
+
+    </div>
         
         </div>
         
@@ -233,15 +241,22 @@
 
                $date = date("d-m-Y", $timess);
 
-               if(!empty($document->Title))
+               if(!empty($document->Title)) {
+                     $field = 'Title';
                     $title = $document->Title;
-
-              if(!empty($document->Title_en))
+                }
+              if(!empty($document->Title_en)) {
+              $field = 'Title_en';
                     $title = $document->Title_en;
-              if(!empty($document->Title_fr))
+              }
+              if(!empty($document->Title_fr)){
+                    $field = 'Title_fr';
                     $title = $document->Title_fr;
-            if(!empty($document->Title_ar))
+              }
+            if(!empty($document->Title_ar)){
+                    $field = 'Title_ar';
                     $title = $document->Title_ar;
+            }
             $class='';
             @endphp
 
@@ -260,10 +275,8 @@
                      
                         <h4 class="media-heading w3-xlarge">
                         <a href="{{ route('articles.show', ['id' => $document->id]) }}">
-                            {!! (count($highlightedDoc->getField('Title'))) ? implode(' ... ', $highlightedDoc->getField('Title')) : $document->Title !!}
-                            {!! (count($highlightedDoc->getField('Title_en'))) ? implode(' ... ', $highlightedDoc->getField('Title_en')) : $document->Title_en !!}
-                            {!! (count($highlightedDoc->getField('Title_fr'))) ? implode(' ... ', $highlightedDoc->getField('Title_fr')) : $document->Title_fr !!}
-                            {!! (count($highlightedDoc->getField('Title_ar'))) ? implode(' ... ', $highlightedDoc->getField('Title_ar')) : $document->Title_ar !!}
+                            {!! (count($highlightedDoc->getField($field))) ? implode(' ... ', $highlightedDoc->getField($field)) : $title !!}
+                            
                         </a>
 
                         </h4>

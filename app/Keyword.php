@@ -7,12 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class Keyword extends Model
 {
     protected $fillable = [
-        'name',
+        'name', 'articles',
     ];
 
-    public function users()
+    protected $events = [
+        'updated' => Events\Notification::class
+    ];
+
+    public function themes()
     {
-    	return $this->belongsToMany('App\User');
+    	return $this->belongsToMany('App\Theme');
     }
 
     public function newsletters()

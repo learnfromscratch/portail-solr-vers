@@ -22,23 +22,24 @@ class Articles
 	public function init()
 	{
 		// get the connected User
-		$user = Auth::user();
+		$querySearched = "";
 
-		// construct the query for searcg
-    	$querySearched = "";
+		if (Auth::user()->groupe->id === 1)
+    			$querySearched = '*:* ';
+  
+    	else
+			$querySearched = (new GetKeywords(Auth::user()))->get();
 
 		
-
+//dd($querySearched);
 		
 		// get a select query instance
 		$query = $this->client->createSelect();
 		$this->client->getPlugin('postbigrequest');
 
 		$helper = $query->getHelper();
-		foreach($user->keywords()->get() as $keyword)
-		{
-			$querySearched .= $helper->escapePhrase($keyword->name);
-		}
+		//$querySearched = (new GetKeywords(Auth::user()))->get();
+		//dd($querySearched);
 		//dd($querySearched);
 		$keywordsquery = "";
 		$Textfields = ['Title_en', 'Title_fr', 'Title_ar' ,'Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
@@ -46,7 +47,7 @@ class Articles
 		foreach ($Textfields as $value) {
 		  $keywordsquery .= $value.":(".$querySearched.") ";
 		}
-
+		
 		$query->createFilterQuery('filterkeywords')->setQuery($keywordsquery);
 		
 		$query->setFields([
@@ -85,7 +86,7 @@ class Articles
 			
 		}
 
-		$query->setStart($this->start)->setRows(1000);
+		$query->setStart($this->start)->setRows(10);
 
 
 		// get the facetset component
@@ -223,48 +224,7 @@ class Articles
 		// this executes the query and returns the result
 		return $resultset = $this->client->select($query);
 	}
-	public function all() {
-		// get the connected User
-		$user = Auth::user();
 
-		// construct the query for searcg
-    	$querySearched = "";
-
-		
-
-		
-		// get a select query instance
-		$query = $this->client->createSelect();
-		$this->client->getPlugin('postbigrequest');
-
-		$helper = $query->getHelper();
-		foreach($user->keywords()->get() as $keyword)
-		{
-			$querySearched .= $helper->escapePhrase($keyword->name);
-		}
-		//dd($querySearched);
-		$keywordsquery = "";
-		$Textfields = ['Title_en', 'Title_fr', 'Title_ar' ,'Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
-
-		foreach ($Textfields as $value) {
-		  $keywordsquery .= $value.":(".$querySearched.") ";
-		}
-
-		$query->createFilterQuery('filterkeywords')->setQuery($keywordsquery);
-		
-		$query->setFields([
-			'id',
-			'Title_en','Title_fr', 'Title_ar',
-			'Fulltext_en','Fulltext_fr','Fulltext_ar',
-			'document', 'Source','SourceName','ArticleLanguage', 'SourceDate','Author','score']);
-		$facetSet = $query->getFacetSet();
-		$facetSet->createFacetField('language')->setField('ArticleLanguage');
-		$facetSet->createFacetField('author')->setField('Author');
-		$facetSet->createFacetField('source')->setField('SourceName');
-		$facetSet->createFacetField('date')->setField('SourceDate');
-		$facetSet->setMinCount(1);
-		return $resultset = $this->client->select($query);
-	}
 
 	public function show($request)
 	{

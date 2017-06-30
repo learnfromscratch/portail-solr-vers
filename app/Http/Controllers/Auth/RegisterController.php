@@ -38,7 +38,7 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('admin');
+        
     }
 
     /**
@@ -47,10 +47,9 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data)
+    public function validator(array $data)
     {
         return Validator::make($data, [
-            'cin' => 'required|max:255|unique:users',
             'name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|min:6|confirmed',
@@ -63,34 +62,28 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return User
      */
-    protected function create(array $data)
+    public function create(array $data)
     {
+        //dd($data);
+        if(empty($data['sous_groupe_id']))
+            $sousgroupe = NULL;
+        else
+            $sousgroupe = $data['sous_groupe_id'];
+
         $user = User::create([
-            'cin' => $data['cin'],
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
-            'tel' => $data['tel'],
-            'address' => $data['address'],
+            'groupe_id' => $data['groupe_id'],
+            'role_id' => $data['role_id'],
+            'sous_groupe_id' => $sousgroupe
         ]);
 
+        // if (isset($data['sous_groupe_id']))
+        // {
+        //     $user->sous_groupe_id = $data['sous_groupe_id'];
+        //     $user->save();
+        // }
 
-
-        $keywordss = explode(',', $data['keywordss']);
-        //$data['keywords'] = explode( ',', $data['keywords'][0] );
-        $keywords = [];
-        foreach ($keywordss as $val)
-        {
-            $keyword = Keyword::firstOrCreate(['name' => $val]);
-            array_push($keywords, $keyword->id);
-        }
-
-        $user->keywords()->attach($keywords === null ? [] : $keywords);
-
-        Abonnement::insert([
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'],
-            'user_id' => $user->id,
-            ]);
     }
 }

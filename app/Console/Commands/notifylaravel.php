@@ -82,23 +82,23 @@ class notifylaravel extends Command
                     //$pdfpath = dirname($path)."/".$pdfname;
                     //echo $pdfname. '- ';
                 if ($doc1['Source'] != '') {
-                    $id_doc = preg_replace(['/_/', '/\s+/'], '', basename($pdfname, '.pdf'));
+                    $id_doc = preg_replace(['/_/', '/\s+/'], '', basename($path, '.xml'));
                     $doc1['id'] = $id_doc;
                     //echo $id_doc .' - ';
                     $pdfname = (string) $xml->Record->Document['name'];
                 
                     $pdfpath = dirname($path)."/".$pdfname;
                     $doc1["document"] = $pdfpath;
-                    if ($doc1['ArticleLanguage'] == 'ENGLISH') {
-                        
-                        // count letter of title
-                        $count = strlen($doc1['Title']);
+                    // count letter of title
+                       // $count = strlen($doc1['Title']);
 
 
                         // delete the count from the fulltext
-                        $fulltext = substr($doc1['Fulltext'], $count);
+                       // $fulltext = substr($doc1['Fulltext'], $count);
+                    if ($doc1['ArticleLanguage'] == 'ENGLISH') {
+                        
 
-                        $doc1['Fulltext_en'] = $fulltext;
+                        $doc1['Fulltext_en'] =  $doc1['Fulltext'];
                         $doc1['Title_en'] = $doc1['Title'];
                     }
                     if ($doc1['ArticleLanguage'] == 'FRENCH') {
@@ -117,7 +117,7 @@ class notifylaravel extends Command
                     $buffer->createDocument($doc1);
                     //array_push($notif, $doc1['id']);
                     $buffer->commit();
-                    HomeController::notifyUser($id_doc,$title,$pdfpath,$this->client,$language);
+                    //HomeController::notifyUser($id_doc,$title,$pdfpath,$this->client,$language);
                     echo 'File created: '.$path.PHP_EOL;
                 }else {
                      \Mail::to('admin@oxdata.ma')->send(new ErrorMails($path));

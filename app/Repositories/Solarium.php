@@ -22,7 +22,7 @@ class Solarium
 	public function indexing()
 	{
         $dir = './Articles';
-        $directory = array_diff(scandir($dir), array('..', '.', '.DS_Store', 'time.txt'));
+        $directory = array_diff(scandir($dir), array('..', '.DS_Store', '.', 'time.txt', 'pdf_download.txt'));
 
         $buffer = $this->client->getPlugin('bufferedadd');
         $buffer->setBufferSize(1000); // this is quite low, in most cases you can use a much higher value
@@ -35,7 +35,7 @@ class Solarium
         $keywordGroups = [];
         foreach ($directory as $files1) {
             $path = $dir.'/'.$files1;
-            $dir1 = array_diff(scandir($path), array('..', '.DS_Store', '.','thefold.lnk'));
+            $dir1 = array_diff(scandir($path), array('..', '.DS_Store', '.'));
             foreach ($dir1 as $file) {
 
                 // $base = basename($file, ".xml");
@@ -79,28 +79,12 @@ class Solarium
      * 
      * @return int notIndexed
     */
-    public function notIndexed()
+    public function indexed()
     {
-        $dir = './Articles';
-        $directory = array_diff(scandir($dir), array('..', '.DS_Store', '.', 'time.txt'));
-        $date = file_get_contents("./Articles/time.txt");
-        $notIndexed = 0;
-        foreach ($directory as $files1) {
-            $path = $dir.'/'.$files1;
-            $dir1 = array_diff(scandir($path), array('..', '.DS_Store', '.','thefold.lnk'));
-            
-            foreach ($dir1 as $file) {
-                //$base = basename($file, ".xml");
-                $newtime = filectime($path."/".$file);
-                if (strtolower(substr($file, strrpos($file, '.') + 1)) == 'xml' 
-                && $newtime > $date ) 
-                {
-                    $notIndexed++;
-                }
-            }   
-        }
+        $params = [];
+        $resultset = (new Articles($this->client,$params,1))->index();
 
-        return $notIndexed;
+        return $indexed = $resultset->getNumfound();
     }
 
 }

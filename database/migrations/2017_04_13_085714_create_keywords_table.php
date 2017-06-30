@@ -28,6 +28,8 @@ class CreateKeywordsTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('keywords');
         Schema::dropIfExists('keywords');
     }
 }
