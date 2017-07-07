@@ -95,7 +95,8 @@ Route::group(['middleware' => 'admin'], function () {
 });
 
 Route::get('test/index', 'TestController@index');
-
+Route::get('/login', 'SessionController@create');
+Route::post('/login', 'SessionController@store')->name('login');
 Route::get('home/expired', function () {
     return view('expire');
 });

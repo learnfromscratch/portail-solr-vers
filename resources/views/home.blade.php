@@ -7,10 +7,11 @@
 @endsection
 
 @section('content')
+@php //$params['language'] = session('language'); @endphp
     <div class="container-fluid">
         <div class="row col-lg-12">
         
-            <form class="search-form" role="search" action="{{ route('roots') }}" method="get">
+        <form class="search-form" role="search" action="{{ route('roots',$params) }}" method="get">
                 <div class="input-group search">
                     <input type="text" value="{{array_key_exists('data',$params) ? $params['data'] : ''}}" name="data"
                            id="data" placeholder="Recherche Initial" class="form-control input-lg" ng-model="name">
@@ -24,11 +25,53 @@
                     Recherche Avancée
                 </a>
             </form>
+            <h1>hello :{{session('language')}}</h1>
 
         </div>
 
 
+        @php
+            $parameters = [];
+            $parameters2 = [];
+            $parameters3 = [];
+            foreach($params as $key => $parm) {
+                $parameters[$key] = $parm;
+                $parameters2[$key]=$parm;
+                $parameters3[$key]=$parm;
+            }
+            //dd($parameters);
+            $choixdate = '';
+            $signs = '?';
+            $signs2 = '?';
+            $signs3 = '?';
+            if(isset($parameters['fromdate']))
+            {
+                $choixdate = $parameters['fromdate'];
+                unset($parameters['fromdate']);
+            }
+            if(isset($parameters2['language']))
+                unset($parameters2['language']);
 
+            if(isset($parameters3['theme']))
+            {
+                unset($parameters3['theme']);
+            }
+
+            if(count($parameters) > 0) {
+                $signs = "&";
+            }
+            
+
+            if(count($parameters2) > 0) {
+                $signs2 = "&";
+            }
+
+
+            if(count($parameters3) > 0) {
+                $signs3 = "&";
+            }
+
+        @endphp
         <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
             <form action="{{ route('roots') }}" method="get">
@@ -89,6 +132,21 @@
                     $params['start'] = 1; 
                 @endphp
         @endif
+        @if(!empty($parameters['start']) and count($parameters) >= 1)
+                @php 
+                    $parameters['start'] = 1; 
+                @endphp
+        @endif
+        @if(!empty($parameters2['start']) and count($parameters2) >= 1)
+                @php 
+                    $parameters2['start'] = 1; 
+                @endphp
+        @endif
+        @if(!empty($parameters3['start']) and count($parameters3) >= 1)
+                @php 
+                    $parameters3['start'] = 1; 
+                @endphp
+        @endif
         <!--
         <div class="row w3-padding-4 w3-margin-bottom w3-blue">
             <h3>{{ __('All Articles : ') }}</h3>
@@ -119,26 +177,39 @@
                 
             </select>
         @endif
-        <!-- This is custom facade, so I have to code everything-->
-        <div class="keywords">
-            @php
+        <br>
+        <div class="themes">
+        <form method="post" action="{{ route('articles.test')}}">
+            {{ csrf_field() }}
+        <input type="hidden" name="pdf" value="{{serialize($pdfs)}}">
+        <input type="hidden" name="titles" value="{{serialize($titles)}}">
+        <input type="hidden" name="language" value="{{serialize($languages)}}">
 
-                 $user = Auth::user();
-            @endphp
-        </div>
+            <button type="submit"  class="w3-btn w3-green download" >{{ __('Exporter la page courante') }}</button>
+            
+        </form>
+    <br><h4>Themes</h4><br>
+    @foreach($numbers as $subject => $count)
+    @if ($count > 0)
+                <a href="{{ route('roots', $parameters3) }}{{$signs3}}theme={{ $subject }}">{{ $subject }}<i>({{$count}})</i></a><br>
+                @endif 
+    @endforeach
+
+    </div>
         <div class="language">       
-            <h4>{{ __('Filter by Language :') }}</h4><br>
+            <br><h4>Langue des Articles: </h4><br>
             @foreach ($facet1 as $value => $count)
-                @if (empty($params['language']))
-                <a href="{{ route('roots', $params) }}{{$sign}}language={{$value}}">{{ $value}}<i>{{$count}}</i></a><br>
-                @elseif ($params['language'] == $value)
+                
+                @if(isset($params['language']) AND $params['language'] == $value)
                      <p class="actives">
                     {{ $value}}
-                     <a href="#" class="closes">
+                     <a href="javascript:;" onclick="cancellink('language');"  class="closes">
                         <i class="fa fa-times-circle" aria-hidden="true"></i>
                      </a>
                      
-                    </p><br>
+                    </p>
+                @else 
+                    <a href="{{ route('roots', $parameters2) }}{{$signs2}}language={{$value}}">{{ $value}}<i>{{$count}}</i></a><br>
                 @endif
             @endforeach
         </div>
@@ -146,29 +217,21 @@
             <h4>{{ __('Filter by Source :') }}</h4><br>
             @foreach ($facet3 as $value => $count)
                
-
+                @if(isset($params['source']) AND $params['source'] == $value)
+                <p class="actives">
+                    {{ $value}}
+                     <a href="javascript:;" onclick="cancellink('source');"  class="closes">
+                        <i class="fa fa-times-circle" aria-hidden="true"></i>
+                     </a>
+                     
+                    </p>
+                    
+                @else
                     <a href="{{ route('roots', $params)}}{{$sign}}source={{$value}}">{{ $value}}</a><i>{{$count}}</i><br>
-                 
+                @endif
             @endforeach
         </div>
-        @php
-            $parameters = [];
-            foreach($params as $key => $parm) {
-                $parameters[$key] = $parm;
-            }
-            //dd($parameters);
-            $choixdate = '';
-            $signs = '?';
-            if(isset($params['fromdate']))
-            {
-                $choixdate = $params['fromdate'];
-                unset($params['fromdate']);
-            }
-
-            if(count($params) > 0) {
-                $signs = "&";
-            }
-        @endphp
+        
 
         <div class="days">
             <h4>5 Derniers Jours</h4>
@@ -176,11 +239,11 @@
             @php $today = date("Y-m-d"); @endphp
             @for($i = 0 ; $i < 5; $i++) 
                 @if($i == 0)
-                    <a href="{{ route('roots', $params) }}{{$signs}}fromdate={{$today}}"> Aujourd'hui</a><br>
+                    <a href="{{ route('roots', $parameters) }}{{$signs}}fromdate={{$today}}"> Aujourd'hui</a><br>
                 @elseif ($i == 1)
-                    <a href="{{ route('roots', $params) }}{{$signs}}fromdate={{date('Y-m-d', strtotime($today. '  -'.$i.' day' ))}}"> Hier</a><br>
+                    <a href="{{ route('roots', $parameters) }}{{$signs}}fromdate={{date('Y-m-d', strtotime($today. '  -'.$i.' day' ))}}"> Hier</a><br>
                 @else
-                    <a href="{{ route('roots', $params) }}{{$signs}}fromdate={{date('Y-m-d', strtotime($today. '  -'.$i.' day' ))}}"> {{date("d-m-Y", strtotime($today. "  -".$i." day" ))}}</a><br>
+                    <a href="{{ route('roots', $parameters) }}{{$signs}}fromdate={{date('Y-m-d', strtotime($today. '  -'.$i.' day' ))}}"> {{date("d-m-Y", strtotime($today. "  -".$i." day" ))}}</a><br>
                      
                 @endif
                 
@@ -190,7 +253,7 @@
         <br>
         <div class="calendrier">
         <h4>Calendrier</h4><br>
-            <form class="form-inline" method="get" action="{{ route('roots', $params)}}">
+            <form class="form-inline" method="get" action="{{ route('roots', $parameters)}}">
                <input type="text" name="fromdate" class="form-control" id="dateinput" placeholder="Calendrier" value="{{$choixdate}}" >
                 <button type="submit" class="btn btn-primary"><i class="fa fa-search fa-fw" aria-hidden="true"></i></button> 
 
@@ -198,18 +261,31 @@
             <br>
     </div>
 
-    <div class="themes">
-    <h4>Themes</h4><br>
-    @foreach($numbers as $subject => $sub)
-        <a class="mdl-navigation__link" href="">{{ $subject }}</a> ({{$sub}})
-    @endforeach
-
-    </div>
+    
         
         </div>
         
         
 <div class="articles">
+
+<div>
+            <b>Filtre Active : </b>
+            
+            @foreach($params as $param => $value)
+                @if(!empty($value) AND $param != 'sort' )
+                    <span class="filters">
+                    
+                        @if($param == 'author') 
+                            @php $value = urldecode($value); @endphp
+                        @endif
+                            <span class="param">{{$param}}:</span>  {{$value }}  <a href="javascript:;" onclick="cancellink('{{$param}}');"  class="closes">
+                                <i class="fa fa-times-circle" aria-hidden="true"></i>
+                             </a>
+                        </span>
+                @endif
+            @endforeach
+            
+        </div>
 <!--
 <form class="search-form form-date" role="search" action="{{ route('roots') }}" method="get">
     <div class="input-daterange input-group ranges" id="datepicker">
@@ -225,11 +301,10 @@
 
         @php 
             $highlighting = $resultset->getHighlighting(); 
-            $pdfs = [];
-            $titles = [];
-            $languages = [];
+            
+            
         @endphp
-
+    
         @foreach ($resultset as $document)
             @php
                 $highlightedDoc = $highlighting->getResult($document->id);
@@ -241,12 +316,8 @@
 
                $date = date("d-m-Y", $timess);
 
-               if(!empty($document->Title)) {
-                     $field = 'Title';
-                    $title = $document->Title;
-                }
-              if(!empty($document->Title_en)) {
-              $field = 'Title_en';
+               if(!empty($document->Title_en)) {
+                    $field = 'Title_en';
                     $title = $document->Title_en;
               }
               if(!empty($document->Title_fr)){
@@ -257,6 +328,7 @@
                     $field = 'Title_ar';
                     $title = $document->Title_ar;
             }
+              
             $class='';
             @endphp
 
@@ -269,7 +341,7 @@
                           
                     <div class="media {{$class}}">
                       <div class="media-left">
-                        <img src="img/paper.png" class="media-object" style="width:90px">
+                        <img src="{{ asset('img/paper.png') }}" class="media-object" style="width:90px">
                       </div>
                       <div class="media-body">
                      
@@ -280,7 +352,11 @@
                         </a>
 
                         </h4>
-                        <i>{{ __('Published on ') }}{{ $date }}</i>
+                        @if($class == 'arabic' )
+                            <i>{{ $date }} </i> نشر في 
+                        @else
+                            <i>{{ __('Published on ') }}{{ $date }}</i>
+                        @endif
                         <p>
                        
                             {!! (count($highlightedDoc->getField('Fulltext'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext')) : substr($document->Fulltext,0,250) !!}
@@ -288,11 +364,22 @@
                             {!! (count($highlightedDoc->getField('Fulltext_fr'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_fr')) : substr($document->Fulltext_fr,0,250) !!}
                             {!! (count($highlightedDoc->getField('Fulltext_ar'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_ar')) : substr($document->Fulltext_ar,0,250) !!} ... <a href="{{ route('articles.show', ['id' => $document->id]) }}" >Voir la suite</a>
                         </p>
-                        <i>{{ __('Source : ') }}<a href="{{ route('roots', $params)}}{{$sign}}source={{$document->SourceName}}">{{ $document->SourceName }}</a></i><br>
-                        
-                        <i>{{ __('Author : ') }}<a href="{{ route('roots', ['author' => urlencode($document->Author)]) }}">{{ $document->Author }}</a></i>
-                        @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
-                            <br><i>Score {{ $document->score }}</i>
+                         @php $url = rawurlencode($document->Author); @endphp
+                         {{$url}}
+                        @if($class == 'arabic' )
+                            <i><a href="{{ route('roots', $params)}}{{$sign}}source={{$document->SourceName}}">{{ $document->SourceName }}</a></i> : المصدر<br>
+                            
+                             <i><a href="{{ route('roots', $params)}}{{$sign}}author={{$document->Author }}">{{ $document->Author }}</a></i> : الكاتب  
+                            @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
+                                <br><i> {{ $document->score }} : التنقيط</i>
+                            @endif
+                        @else
+                            <i>{{ __('Source : ') }}<a href="{{ route('roots', $params)}}{{$sign}}source={{$document->SourceName}}">{{ $document->SourceName }}</a></i><br>
+                            
+                            <i>{{ __('Author : ') }}<a href="{{ route('roots', $params)}}{{$sign}}author={{$url}}">{{ $document->Author }}</a></i>
+                            @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
+                                <br><i>Score {{ $document->score }}</i>
+                            @endif
                         @endif
                         <br><a href="{{ $pdf1 }}" target="_blank" class="w3-btn w3-green">{{ __('View PDF') }}</a>
                       
@@ -301,21 +388,12 @@
 
                 </div>
                 @php 
-                    array_push($pdfs, $pdf);
-                    array_push($titles, $title);
-                    array_push($languages, $document->ArticleLanguage);
+                    
+                    
                     
                 @endphp
         @endforeach
-        <form method="post" action="{{ route('articles.test')}}">
-            {{ csrf_field() }}
-        <input type="hidden" name="pdf" value="{{serialize($pdfs)}}">
-        <input type="hidden" name="titles" value="{{serialize($titles)}}">
-        <input type="hidden" name="language" value="{{serialize($languages)}}">
-
-            <button type="submit"  class="w3-btn pull-left w3-green download" >{{ __('Exporter les PDF') }}</button>
-            
-        </form>
+        
 
 
         <!--
@@ -420,14 +498,16 @@
 <script>
 
 
-
+    function cancellink(value) {
+        window.location = removeURLParameter(window.location.href, value);
+    }
     function getComboA(selectObject) {
         var value = selectObject.value;
         
           
-        console.log(value);
+        
 
-        window.location =  '?data='+getParameterByName('data')+'&allthiswords='+getParameterByName('allthiswords')+'&noneofthis='+getParameterByName('noneofthis')+'&orwords='+getParameterByName('orwords')+'&sort='+value;
+        window.location =  '?data='+getParameterByName('data')+'&allthiswords='+getParameterByName('allthiswords')+'&noneofthis='+getParameterByName('noneofthis')+'&orwords='+getParameterByName('orwords')+'&language='+getParameterByName('language')+'&sort='+value;
     }
     function getParameterByName(name, url) {
         if (!url) url = window.location.href;
@@ -439,7 +519,28 @@
         return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-   
+   function removeURLParameter(url, parameter) {
+    //prefer to use l.search if you have a location/link object
+    var urlparts= url.split('?');   
+    if (urlparts.length>=2) {
+
+        var prefix= encodeURIComponent(parameter)+'=';
+        var pars= urlparts[1].split(/[&;]/g);
+
+        //reverse iteration as may be destructive
+        for (var i= pars.length; i-- > 0;) {    
+            //idiom for string.startsWith
+            if (pars[i].lastIndexOf(prefix, 0) !== -1) {  
+                pars.splice(i, 1);
+            }
+        }
+
+        url= urlparts[0] + (pars.length > 0 ? '?' + pars.join('&') : "");
+        return url;
+    } else {
+        return url;
+    }
+}
 </script>
 
 @endsection

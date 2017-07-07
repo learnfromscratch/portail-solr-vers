@@ -85,13 +85,19 @@
 
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href=""><i class="fa fa-user-o fa-lg fa-fw"></i> Mon profil</a></li>
-                                @if (Auth::user()->role == 'admin')
-                                    <li>
-                                        <a href="{{ route('dashboard') }}">
-                                            <i class="fa fa-lock fa-lg fa-fw" aria-hidden="true"></i> Espace administration
-                                        </a>
-                                    </li>
-                                @endif
+
+
+                                  @if (Auth::user()->role_id === 1)
+                                  <li>
+                <a href="{{ route('admin.dashboard') }}"><i class="fa fa-lock fa-lg fa-fw" aria-hidden="true"></i> Espace Administration</a>
+                </li>
+              @endif
+              @if (Auth::user()->role_id === 2)
+              <li>
+                <a class="mdl-navigation__link" href="{{ route('client.admin', ['id' => Auth::user()->groupe->id]) }}"><i class="fa fa-lock fa-lg fa-fw" aria-hidden="true"></i>Tableau de bord</a>
+              </li>
+              @endif
+                               
                                 <li role="separator" class="divider"></li>
                                 <li>
                                     <a href="{{ route('logout') }}"

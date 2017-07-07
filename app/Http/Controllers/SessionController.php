@@ -16,6 +16,7 @@ class SessionController extends Controller
     	if (!auth()->attempt(request(['email','password']))) {
     		return back();
     	} 
+         session(['language' => request('language')]);
     	//dd(request('lang'));
     	return redirect('/'.request('language'));
     }

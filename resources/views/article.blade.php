@@ -5,6 +5,29 @@
 @endsection
 
 @section('content')
+@php
+            $parameters = [];
+            foreach($params as $key => $parm) {
+                $parameters[$key] = $parm;
+            }
+            //dd($parameters);
+            $choixdate = '';
+            $signs = '?';
+            if(isset($parameters['fromdate']))
+            {
+                $choixdate = $parameters['fromdate'];
+                unset($parameters['fromdate']);
+            }
+
+            if(isset($parameters['theme']))
+            {
+                unset($parameters['theme']);
+            }
+
+            if(count($parameters) > 0) {
+                $signs = "&";
+            }
+        @endphp
     <div class="container-fluid">
         <div class="row col-lg-12">
             <form class="search-form" role="search" action="{{ route('roots') }}" method="get">
@@ -107,7 +130,15 @@
                 
             </select>
         @endif
-        <!-- This is custom facade, so I have to code everything-->
+        <div class="themes">
+    <h4>Themes</h4><br>
+    @foreach($numbers as $subject => $count)
+    @if ($count > 0)
+                <a href="{{ route('roots', $parameters) }}{{$signs}}theme={{ $subject }}">{{ $subject }}<i>({{$count}})</i></a><br>
+                @endif 
+    @endforeach
+
+    </div><!-- This is custom facade, so I have to code everything-->
         <div class="keywords">
             @php
 
@@ -141,24 +172,7 @@
                 @endif
             @endforeach
         </div>
-        @php
-            $parameters = [];
-            foreach($params as $key => $parm) {
-                $parameters[$key] = $parm;
-            }
-            //dd($parameters);
-            $choixdate = '';
-            $signs = '?';
-            if(isset($params['fromdate']))
-            {
-                $choixdate = $params['fromdate'];
-                unset($params['fromdate']);
-            }
-
-            if(count($params) > 0) {
-                $signs = "&";
-            }
-        @endphp
+        
 
         <div class="days">
             <h4>5 Derniers Jours</h4>

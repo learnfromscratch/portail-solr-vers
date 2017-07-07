@@ -110,11 +110,17 @@ nav[aria-label="Page navigation"] {
 	        width: 104%
 }
 .download {
-	    position: absolute;
-    top: -19px;
+    /*position: absolute;*/
+    /*top: -19px;*/
     /*right: -14px;*/
 }
-
+.filters {
+        background: #0a93ab;
+    padding: 5px;
+    color: white;
+    border-radius: 3px;
+        margin-right: 5px;
+}
 .widget i {
 	float:right;
 }
@@ -162,8 +168,11 @@ nav[aria-label="Page navigation"] {
     border: none;
 }
 */
-.widget .closes {
-	color: white;
+
+
+.closes {
+    color: #f1f1f1 !important;
+    text-decoration: none !important;
 }
 
 .search-form .search button {

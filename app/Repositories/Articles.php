@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use Illuminate\Support\Facades\Auth;
+use App\Theme;
 
 /**
 * 
@@ -18,9 +19,7 @@ class Articles
 		$this->start = ($start - 1)*10;
 	}
 
-
-	public function init()
-	{
+	public function baseFilter() {
 		// get the connected User
 		$querySearched = "";
 
@@ -56,14 +55,38 @@ class Articles
 			'Fulltext_en','Fulltext_fr','Fulltext_ar',
 			'document', 'Source','SourceName','ArticleLanguage', 'SourceDate','Author','score']);
 
+		$facetSet = $query->getFacetSet();
+		$facetSet->createFacetField('language')->setField('ArticleLanguage');
+		$facetSet->createFacetField('author')->setField('Author');
+		$facetSet->createFacetField('source')->setField('SourceName');
+		$facetSet->createFacetField('date')->setField('SourceDate');
+		$facetSet->setMinCount(1);
+		return $query;
+
+	}
+	public function init($query)
+	{
+		$helper = $query->getHelper();
+		$Textfields = ['Title_en', 'Title_fr', 'Title_ar' ,'Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
 
 		// get the dismax component and set a boost query
 		
 		//Fulltext_en:(("fondation" "mohammed") AND ("mise" AND ) (NOT"" NOT""))
 
 		//Fulltext_fr:(("fondation" "mohammed") AND ("mise" AND "Ouverture") NOT "beauté")
+		if (isset($this->params['theme']))
+		{
+			$thequery = "";
+			$keywor = new GetKeywords(Auth::user());
+			$theme = Theme::where('name', $this->params['theme'])->first();
+			
+			$keywos = $keywor->getKeywordsByTheme($theme);
+			foreach ($Textfields as $value) {
+                $thequery .= $value.':('.$keywos.') ';
+            }
+            $query->createFilterQuery('filterthemess')->setQuery($thequery);
 
-		
+		}
 		if (isset($this->params['data']))
 		{
 			//$query->setQuery($helper->escapePhrase($_GET['searchterm']));
@@ -91,11 +114,7 @@ class Articles
 
 		// get the facetset component
 		$facetSet = $query->getFacetSet();
-		$facetSet->createFacetField('language')->setField('ArticleLanguage');
-		$facetSet->createFacetField('author')->setField('Author');
-		$facetSet->createFacetField('source')->setField('SourceName');
-		$facetSet->createFacetField('date')->setField('SourceDate');
-		$facetSet->setMinCount(1);
+		
 
 		// Get highlighting component, and apply settings
 		$hl = $query->getHighlighting();
@@ -105,13 +124,16 @@ class Articles
 		$hl->setSimplePrefix('<strong>');
 		$hl->setSimplePostfix('</strong>');
 		if (isset($this->params['language'])) {
+			//session(['language' => $this->params['language']]);
 			$query->createFilterQuery('language')->setQuery('ArticleLanguage:"'.$helper->escapePhrase($this->params['language']).'"');
 		}
+		
 		if (isset($this->params['source'])) {
 			$query->createFilterQuery('source')->setQuery('SourceName:'.$helper->escapePhrase($this->params['source']));
 		}
+		//dd($this->params['author']);
 		if (isset($this->params['author'])) {
-			$query->createFilterQuery('author')->setQuery('Author:'.$helper->escapePhrase(urldecode($this->params['author'])));
+			$query->createFilterQuery('author')->setQuery('Author:'.$helper->escapePhrase($this->params['author']));
 			//dd($query->getQuery());
 
 			//dd('Author:'.$helper->escapeTerm($this->params['author']));
@@ -190,6 +212,8 @@ class Articles
 			}
 
 			//dd($thequery);
+			$thequery3 = '('.$thequery2.')';
+			
 
 			$excludequery = $thequery2;
 
@@ -207,7 +231,7 @@ class Articles
 			$query->setQuery($allquery);
 
 		}
-		//dd($query);
+		//dd($allquery);
 		return $query;
 
 	}
@@ -219,23 +243,21 @@ class Articles
 	*/
 	public function index()
 	{
-		$query = Articles::init();
+		$query = Articles::baseFilter();
+		$query = Articles::init($query);
 
 		// this executes the query and returns the result
 		return $resultset = $this->client->select($query);
 	}
 
 
-	public function show($request)
+	public function show()
 	{
-		$query = Articles::init();
-		$helper = $query->getHelper();
+		$query = Articles::baseFilter();
+		$query = Articles::init($query);
+		//$query = Articles::init();
 
-		$thequery = 'id:"'.$request.'"';
-		$query->setQuery($thequery);
-
-		// this executes the query and returns the result
-		return $resultset = $this->client->select($query);	
+		return $query;	
 	}
 
 }

@@ -28,6 +28,7 @@ class HomeController extends Controller
     public function __construct(\Solarium\Client $client)
     {
         $this->middleware('auth');
+         $this->middleware('language');
         //$this->middleware('abonnement');
         $this->client = $client;
         
@@ -50,10 +51,12 @@ class HomeController extends Controller
       $id = User::findOrNew(10)->name;
       dd($id);
       */
+      //dd($request->segment(1));
         $keys = [];
         $counts = [];
         $Textfields = ['Title','Title_en', 'Title_fr', 'Title_ar' ,'Fulltext','Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
         $params = $request->all();
+        //$params['language'] = session('language');
         if (empty($params))
             $sign = "?";
         else
@@ -66,15 +69,21 @@ class HomeController extends Controller
             $start = $request->start;
 
         $folderPdfs = "Articles";
+        $query = (new Articles($this->client,$params,$start))->baseFilter();
+        $resultset = $this->client->select($query);
 
-        $resultset = (new Articles($this->client,$params,$start))->index();
-        //$result = (new Articles($this->client,$params,$start))->all();
+         //$result = (new Articles($this->client,$params,$start))->all();
         $facet1 = $resultset->getFacetSet()->getFacet('language');
         //$facet2 = $resultset->getFacetSet()->getFacet('author');
-        $facet3 = $resultset->getFacetSet()->getFacet('source');
+        
         $facet4 = $resultset->getFacetSet()->getFacet('date');
 
-       $query = (new Articles($this->client,$params,$start))->init();
+        //$query1 = $resultset = (new Articles($this->client,$params,$start))->init();
+        $resultset = (new Articles($this->client,$params,$start))->index($query);
+
+        //$query = (new Articles($this->client,$params,$start))->init($query);
+       $facet3 = $resultset->getFacetSet()->getFacet('source');
+       //$query = (new Articles($this->client,$params,$start))->init();
        $helper = $query->getHelper();
         $keywordfacet = [];
        
@@ -126,12 +135,29 @@ class HomeController extends Controller
 
          $numbers = array_combine($keyss, $count);
 
-        //dd($numbers);
-        
-
-         //dd($resultset);
+         $pdfs = [];
+         $titles = [];
+         $languages = [];
+         foreach ($resultset as $document) {
+            if(!empty($document->Title_en)) {
+                    $field = 'Title_en';
+                    $title = $document->Title_en;
+              }
+              if(!empty($document->Title_fr)){
+                    $field = 'Title_fr';
+                    $title = $document->Title_fr;
+              }
+            if(!empty($document->Title_ar)){
+                    $field = 'Title_ar';
+                    $title = $document->Title_ar;
+            }
+             array_push($pdfs, $document->document);
+             array_push($titles, $title);
+             array_push($languages, $document->ArticleLanguage);
+         }
+         
          //$this->user_id = 
-        return view('home', compact('request','resultset','themes', 'folderPdfs', 'facet1', 'facet2', 'facet3','facet4','params','sign','numbers','user_id'));
+        return view('home', compact('request','resultset','themes', 'folderPdfs', 'facet1', 'facet2', 'facet3','facet4','params','sign','numbers','user_id','pdfs','titles', 'languages'));
     }
 
 
@@ -141,47 +167,79 @@ class HomeController extends Controller
         $keys = [];
         $counts = [];
         $params = $request->all();
+        //$params['language'] = session('language');
+        //dd($params);
         if (empty($params))
             $sign = "?";
         else
             $sign="&";
-        $resultset = (new Articles($this->client,$params,1))->show($request->id);  
+
+
+        
+        
+        // this executes the query and returns the result
+         
+        $query = (new Articles($this->client,$params,1))->show();  
+        $helper = $query->getHelper();
+
+        //$thequery = 'id:"'.$request->id.'"';
+        
+        $query->createFilterQuery('filterid')->setQuery("id:".$helper->escapePhrase($request->id));
+        //$query->setQuery($thequery);
+         $user = Auth::user();
+        if ($user->groupe->id === 1) {
+            $themes = Theme::all();
+        } 
+        elseif ($user->role->name === 'Admin') {
+            $themes = $user->groupe->themes;
+        }
+        
+        else {
+            $themes = $user->groupe->themes;
+        }
+        $resultset = $this->client->select($query);
+        
         $facet1 = $resultset->getFacetSet()->getFacet('language');
         $facet2 = $resultset->getFacetSet()->getFacet('author');
         $facet3 = $resultset->getFacetSet()->getFacet('source');
         $facet4 = $resultset->getFacetSet()->getFacet('date');
  
-        $user = Auth::user();
-         foreach ($themes as $theme) {
-            // array of keywords
-            $keywords = getkeywords($theme);
-            
-        }
-
-        foreach($user->keywords()->get() as $keyword) {
-            $countkey = 0;
-            $query = $this->client->createSelect();
+                
         
+
+ $Textfields = ['Title_en', 'Title_fr', 'Title_ar','Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
+
+        $keywor = new GetKeywords($user);
+
+        $keys = [];
+        $counts = [];
+        foreach($themes as $theme) {
+            $thequery = "";
+            
+            $keywos = $keywor->getKeywordsByTheme($theme);
+            
+            foreach ($Textfields as $value) {
+                $thequery .= $value.':('.$keywos.') ';
+            }
+
             $query->setFields([
             'Title_en','Title_fr', 'Title_ar',
             'Fulltext_en','Fulltext_fr','Fulltext_ar']);
         
+            $query->setQuery($thequery);
+            //$resultset2 = $this->client->select($query);
+            //$counts = $resultset2->getNumFound();
+
+            $countkey = 0;
+            //$query = $this->client->createSelect();
+        
+            
 
         // get the dismax component and set a boost query
-        $edismax = $query->getEDisMax();
-        $helper = $query->getHelper();
+        //$edismax = $query->getEDisMax();
+        //$helper = $query->getHelper();
 
-        $query->createFilterQuery('filterid')->setQuery("id:".$helper->escapePhrase($request->id));
-        //$query->setStart(0)->setRows(20);
-        $thequery = "";
-            $Textfields = ['Title','Title_en', 'Title_fr', 'Title_ar' ,'Fulltext','Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
-
-            foreach ($Textfields as $value) {
-                $thequery .= $value.':("'.$keyword->name.'") ';
-
-            }
             
-            $query->setQuery($thequery);
         // Get highlighting component, and apply settings
        $hl = $query->getHighlighting();
         
@@ -205,13 +263,12 @@ class HomeController extends Controller
             $countkey = count($highlightedDoc->getField('Title')) + count($highlightedDoc->getField('Title_en')) + count($highlightedDoc->getField('Title_fr')) + count($highlightedDoc->getField('Title_ar')) + count($highlightedDoc->getField('Fulltext')) + count($highlightedDoc->getField('Fulltext_en')) + count($highlightedDoc->getField('Fulltext_fr')) + count($highlightedDoc->getField('Fulltext_ar'));
             }
 
-            array_push($keys, $keyword->name);
+            array_push($keys, $theme->name);
             array_push($counts, $countkey);
 
-        //$hl->setSimplePrefix('<strong>');
-        //$hl->setSimplePostfix('</strong>');
-           //$countkey=0;
+            
         }
+
         $numbers = array_combine($keys, $counts);
         $user_id = Auth::user()->id;
         return view('article', compact('resultset', 'folderPdfs','numbers','user_id', 'facet1', 'facet2', 'facet3','facet4','params','sign'));
@@ -243,7 +300,7 @@ class HomeController extends Controller
         $pdf->Cell(190, 20, 'Revue de presse', 1, 1, 'C');
         $pdf->SetFontSize(12);
         $pdf->Ln(120);
-        $pdf->Cell(190, 20, 'Envoyé le :'.date("d-m-Y"), 0, 1, 'C');
+        $pdf->Cell(190, 20, 'Redigé le :'.date("d-m-Y"), 0, 1, 'C');
         //$pdf->addPage();
          $pdf->SetFont('times');
         $pdf->addPage();

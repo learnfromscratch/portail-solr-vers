@@ -114,6 +114,7 @@ class notifylaravel extends Command
                     $language = $doc1['ArticleLanguage']; 
                     unset($doc1['Fulltext']);
                     unset($doc1['Title']);
+                    $doc1['Author'] = trim($doc1['Author']);
                     $buffer->createDocument($doc1);
                     //array_push($notif, $doc1['id']);
                     $buffer->commit();
