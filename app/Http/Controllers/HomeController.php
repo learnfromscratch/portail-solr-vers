@@ -56,6 +56,7 @@ class HomeController extends Controller
         $counts = [];
         $Textfields = ['Title','Title_en', 'Title_fr', 'Title_ar' ,'Fulltext','Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
         $params = $request->all();
+        
         //$params['language'] = session('language');
         if (empty($params))
             $sign = "?";
@@ -79,7 +80,7 @@ class HomeController extends Controller
         $facet4 = $resultset->getFacetSet()->getFacet('date');
 
         //$query1 = $resultset = (new Articles($this->client,$params,$start))->init();
-        $resultset = (new Articles($this->client,$params,$start))->index($query);
+        $resultset = (new Articles($this->client,$params,$start))->index($request);
 
         //$query = (new Articles($this->client,$params,$start))->init($query);
        $facet3 = $resultset->getFacetSet()->getFacet('source');
@@ -286,8 +287,8 @@ class HomeController extends Controller
         $pdf = new ConcatPdf;
         
         //$pdf->SetCompression(true);
+        //dd($request->language);
         $pdf->addPage();
-
         $pdfs = unserialize($request->pdf);
         $languages = unserialize($request->language);
         $titles = unserialize($request->titles); 

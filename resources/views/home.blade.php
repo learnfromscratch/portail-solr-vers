@@ -9,7 +9,8 @@
 @section('content')
 @php //$params['language'] = session('language'); @endphp
     <div class="container-fluid">
-        <div class="row col-lg-12">
+        <div class="rechercher row">
+             <div class="col-md-6 col-md-offset-3">
         
         <form class="search-form" role="search" action="{{ route('roots',$params) }}" method="get">
                 <div class="input-group search">
@@ -21,13 +22,19 @@
                     <!-- Button trigger modal -->
 
                 </div>
-                <a class="recherche" data-toggle="modal" href="#exampleModal">
+                    <a class="recherche pull-right" data-toggle="modal" href="#exampleModal">
                     Recherche Avancée
                 </a>
-            </form>
-            <h1>hello :{{session('language')}}</h1>
 
+                
+        </form>
+            <!--<h1>hello :{{session('language')}}</h1>!-->
+
+       
         </div>
+        
+        </div>
+
 
 
         @php
@@ -155,13 +162,25 @@
 -->
 <!--
     <p>Active Filters : <i class="badge"  >English</i><i class="badge"  >Date <a href="#">x</a></i></p>
--->     <div class="article-widget">
-        <div class="widget">
+-->     <div class="article-widget row">
+        <div class="widget col-md-3">
         <em class="number-articles">{{ __('Number of articles : ') }}<i>{{ $resultset->getNumFound() }} </i></em>
+        <div class="download-pdfs">
+            <form method="post" action="{{ route('articles.test')}}" >
+            {{ csrf_field() }}
+        <input type="hidden" name="pdf" value="{{serialize($pdfs)}}">
+        <input type="hidden" name="titles" value="{{serialize($titles)}}">
+        <input type="hidden" name="language" value="{{serialize($languages)}}">
+
+            <button type="submit"  class="w3-btn w3-green download" >{{ __('Exporter la page courante') }}</button>
+            
+        </form>
+        </div>
+        <br>
             @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords'])
             OR !empty($params['orwords']))
             
-            <br><br>
+            
             <select id="comboA" onchange="getComboA(this)" class="form-control">
                 @if(!empty($params['sort']) and $params['sort'] == 'pertinence')
                     <option value='pertinence' selected="selected">Relevance</option>
@@ -176,40 +195,32 @@
                 @endif
                 
             </select>
+            <br>
         @endif
-        <br>
-        <div class="themes">
-        <form method="post" action="{{ route('articles.test')}}">
-            {{ csrf_field() }}
-        <input type="hidden" name="pdf" value="{{serialize($pdfs)}}">
-        <input type="hidden" name="titles" value="{{serialize($titles)}}">
-        <input type="hidden" name="language" value="{{serialize($languages)}}">
-
-            <button type="submit"  class="w3-btn w3-green download" >{{ __('Exporter la page courante') }}</button>
-            
-        </form>
-    <br><h4>Themes</h4><br>
-    @foreach($numbers as $subject => $count)
-    @if ($count > 0)
-                <a href="{{ route('roots', $parameters3) }}{{$signs3}}theme={{ $subject }}">{{ $subject }}<i>({{$count}})</i></a><br>
-                @endif 
-    @endforeach
-
-    </div>
+        
+     
         <div class="language">       
-            <br><h4>Langue des Articles: </h4><br>
+            <h4>Langue des Articles: </h4><br>
+            <!-- do this in the indexation-->
             @foreach ($facet1 as $value => $count)
-                
-                @if(isset($params['language']) AND $params['language'] == $value)
+                @if($value == 'ENGLISH')
+                        @php $values = 'en'; @endphp
+                    @elseif ($value == 'Arabic')
+                        @php $values = 'ar'; @endphp
+                    @endif
+                @if(Request::segment(1) == $values)
+
                      <p class="actives">
                     {{ $value}}
-                     <a href="javascript:;" onclick="cancellink('language');"  class="closes">
-                        <i class="fa fa-times-circle" aria-hidden="true"></i>
-                     </a>
+                     
                      
                     </p>
-                @else 
-                    <a href="{{ route('roots', $parameters2) }}{{$signs2}}language={{$value}}">{{ $value}}<i>{{$count}}</i></a><br>
+                
+                @else
+
+                     
+                    
+                    <a href="http://localhost/portail/public/{{$values}}">{{ $value}}<i>{{$count}}</i></a><br>
                 @endif
             @endforeach
         </div>
@@ -232,9 +243,17 @@
             @endforeach
         </div>
         
+        <div class="categories">
 
+            <h4>Filtrer par Categorie</h4> <br>
+             
+            
+
+        </div>
+        <br>
         <div class="days">
-            <h4>5 Derniers Jours</h4>
+
+            <h4>5 Derniers Jours</h4> <br>
 
             @php $today = date("Y-m-d"); @endphp
             @for($i = 0 ; $i < 5; $i++) 
@@ -250,30 +269,35 @@
             @endfor
 
         </div>
-        <br>
-        <div class="calendrier">
-        <h4>Calendrier</h4><br>
-            <form class="form-inline" method="get" action="{{ route('roots', $parameters)}}">
-               <input type="text" name="fromdate" class="form-control" id="dateinput" placeholder="Calendrier" value="{{$choixdate}}" >
-                <button type="submit" class="btn btn-primary"><i class="fa fa-search fa-fw" aria-hidden="true"></i></button> 
 
-            </form>
-            <br>
-    </div>
+
+        <br>
+        
 
     
         
         </div>
         
         
-<div class="articles">
+<div class="articles col-md-6">
 
 <div>
             <b>Filtre Active : </b>
             
+             @if(Request::segment(1) == "en")
+                @php $values = "anglais"; @endphp
+            @elseif(Request::segment(1) == "fr")
+                @php $values = "Francais"; @endphp
+            @else
+                 @php $values = "Arabe"; @endphp
+            @endif
+                <div class="filters" style="display:inline-block;">
+                    <span class="param">Langage:{{$values}}</span>
+                </div>
+            
             @foreach($params as $param => $value)
                 @if(!empty($value) AND $param != 'sort' )
-                    <span class="filters">
+                    <div class="filters" style="display:inline-block;">
                     
                         @if($param == 'author') 
                             @php $value = urldecode($value); @endphp
@@ -281,7 +305,7 @@
                             <span class="param">{{$param}}:</span>  {{$value }}  <a href="javascript:;" onclick="cancellink('{{$param}}');"  class="closes">
                                 <i class="fa fa-times-circle" aria-hidden="true"></i>
                              </a>
-                        </span>
+                        </div>
                 @endif
             @endforeach
             
@@ -304,197 +328,228 @@
             
             
         @endphp
+
+        @if($resultset->getNumFound() > 0 )
     
-        @foreach ($resultset as $document)
-            @php
-                $highlightedDoc = $highlighting->getResult($document->id);
-                $pdf = $document->document;
-               $pdf1 = str_replace('C:\wamp64\www', '', $pdf);
-               
-                $datesolr = substr($document->SourceDate,0,10);
-               $timess = strtotime($datesolr);
+            @foreach ($resultset as $document)
+                @php
+                    $highlightedDoc = $highlighting->getResult($document->id);
+                    $pdf = $document->document;
+                   $pdf1 = str_replace('C:\wamp64\www', '', $pdf);
+                   
+                    $datesolr = substr($document->SourceDate,0,10);
+                   $timess = strtotime($datesolr);
 
-               $date = date("d-m-Y", $timess);
+                   $date = date("d-m-Y", $timess);
 
-               if(!empty($document->Title_en)) {
-                    $field = 'Title_en';
-                    $title = $document->Title_en;
-              }
-              if(!empty($document->Title_fr)){
-                    $field = 'Title_fr';
-                    $title = $document->Title_fr;
-              }
-            if(!empty($document->Title_ar)){
-                    $field = 'Title_ar';
-                    $title = $document->Title_ar;
-            }
-              
-            $class='';
-            @endphp
-
-            @if($document->ArticleLanguage ==  "Arabic" AND $date != "14-06-2017" AND $date != "15-06-2017") 
-                @php 
-                    $class = 'arabic';
+                   if(!empty($document->Title_en)) {
+                        $field = 'Title_en';
+                        $title = $document->Title_en;
+                  }
+                  if(!empty($document->Title_fr)){
+                        $field = 'Title_fr';
+                        $title = $document->Title_fr;
+                  }
+                if(!empty($document->Title_ar)){
+                        $field = 'Title_ar';
+                        $title = $document->Title_ar;
+                }
+                  
+                $class='';
                 @endphp
-            @endif
-                <div class="row w3-margin-bottom">
+
+                @if($document->ArticleLanguage ==  "Arabic" AND $date != "14-06-2017" AND $date != "15-06-2017") 
+                    @php 
+                        $class = 'arabic';
+                    @endphp
+                @endif
+                    <div class="row w3-margin-bottom">
+                              
+                        <div class="media {{$class}}">
+                          <div class="media-left">
+                            <img src="{{ asset('img/paper.png') }}" class="media-object" style="width:90px">
+                          </div>
+                          <div class="media-body">
+                         
+                            <h4 class="media-heading w3-xlarge">
+                            <a href="{{ route('articles.show', ['id' => $document->id]) }}">
+                                {!! (count($highlightedDoc->getField($field))) ? implode(' ... ', $highlightedDoc->getField($field)) : $title !!}
+                                
+                            </a>
+
+                            </h4>
+                            @if($class == 'arabic' )
+                                <i>{{ $date }} </i> نشر في 
+                            @else
+                                <i>{{ __('Published on ') }}{{ $date }}</i>
+                            @endif
+                            @if($class == 'arabic' )
+                            <p>
+                           
+                                {!! (count($highlightedDoc->getField('Fulltext'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext')) : substr($document->Fulltext,0,250) !!}
+                                {!! (count($highlightedDoc->getField('Fulltext_en'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_en')) : substr($document->Fulltext_en,0,250) !!}
+                                {!! (count($highlightedDoc->getField('Fulltext_fr'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_fr')) : substr($document->Fulltext_fr,0,250) !!}
+                                {!! (count($highlightedDoc->getField('Fulltext_ar'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_ar')) : substr($document->Fulltext_ar,0,250) !!}  <a href="{{ route('articles.show', ['id' => $document->id]) }}" >... أكمل القراءة </a>
+                            </p>
+                             
+                            
+                                <i><a href="{{ route('roots', $params)}}{{$sign}}source={{$document->SourceName}}">{{ $document->SourceName }}</a></i> : المصدر<br>
+                                
+                                 <i><a href="{{ route('roots', $params)}}{{$sign}}author={{$document->Author }}">{{ $document->Author }}</a></i> : الكاتب  
+                                @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
+                                    <br><i> {{ $document->score }} : التنقيط</i>
+                                @endif
+                            @else
+                            <p>
+                           
+                                {!! (count($highlightedDoc->getField('Fulltext'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext')) : substr($document->Fulltext,0,250) !!}
+                                {!! (count($highlightedDoc->getField('Fulltext_en'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_en')) : substr($document->Fulltext_en,0,250) !!}
+                                {!! (count($highlightedDoc->getField('Fulltext_fr'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_fr')) : substr($document->Fulltext_fr,0,250) !!}
+                                {!! (count($highlightedDoc->getField('Fulltext_ar'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_ar')) : substr($document->Fulltext_ar,0,250) !!}  <a href="{{ route('articles.show', ['id' => $document->id]) }}" >Voir la suite ... </a>
+                            </p>
+                                <i>{{ __('Source : ') }}<a href="{{ route('roots', $params)}}{{$sign}}source={{$document->SourceName}}">{{ $document->SourceName }}</a></i><br>
+                                
+                                <i>{{ __('Author : ') }}<a href="{{ route('roots', $params)}}{{$sign}}author={{$document->Author }}">{{ $document->Author }}</a></i>
+                                @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
+                                    <br><i>Score {{ $document->score }}</i>
+                                @endif
+                            @endif
+                            <br><a href="{{ $pdf1 }}" target="_blank" class="w3-btn w3-green">{{ __('View PDF') }}</a>
                           
-                    <div class="media {{$class}}">
-                      <div class="media-left">
-                        <img src="{{ asset('img/paper.png') }}" class="media-object" style="width:90px">
-                      </div>
-                      <div class="media-body">
-                     
-                        <h4 class="media-heading w3-xlarge">
-                        <a href="{{ route('articles.show', ['id' => $document->id]) }}">
-                            {!! (count($highlightedDoc->getField($field))) ? implode(' ... ', $highlightedDoc->getField($field)) : $title !!}
-                            
-                        </a>
+                          </div>
+                        </div>
 
-                        </h4>
-                        @if($class == 'arabic' )
-                            <i>{{ $date }} </i> نشر في 
-                        @else
-                            <i>{{ __('Published on ') }}{{ $date }}</i>
-                        @endif
-                        <p>
-                       
-                            {!! (count($highlightedDoc->getField('Fulltext'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext')) : substr($document->Fulltext,0,250) !!}
-                            {!! (count($highlightedDoc->getField('Fulltext_en'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_en')) : substr($document->Fulltext_en,0,250) !!}
-                            {!! (count($highlightedDoc->getField('Fulltext_fr'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_fr')) : substr($document->Fulltext_fr,0,250) !!}
-                            {!! (count($highlightedDoc->getField('Fulltext_ar'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_ar')) : substr($document->Fulltext_ar,0,250) !!} ... <a href="{{ route('articles.show', ['id' => $document->id]) }}" >Voir la suite</a>
-                        </p>
-                         @php $url = rawurlencode($document->Author); @endphp
-                         {{$url}}
-                        @if($class == 'arabic' )
-                            <i><a href="{{ route('roots', $params)}}{{$sign}}source={{$document->SourceName}}">{{ $document->SourceName }}</a></i> : المصدر<br>
-                            
-                             <i><a href="{{ route('roots', $params)}}{{$sign}}author={{$document->Author }}">{{ $document->Author }}</a></i> : الكاتب  
-                            @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
-                                <br><i> {{ $document->score }} : التنقيط</i>
-                            @endif
-                        @else
-                            <i>{{ __('Source : ') }}<a href="{{ route('roots', $params)}}{{$sign}}source={{$document->SourceName}}">{{ $document->SourceName }}</a></i><br>
-                            
-                            <i>{{ __('Author : ') }}<a href="{{ route('roots', $params)}}{{$sign}}author={{$url}}">{{ $document->Author }}</a></i>
-                            @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
-                                <br><i>Score {{ $document->score }}</i>
-                            @endif
-                        @endif
-                        <br><a href="{{ $pdf1 }}" target="_blank" class="w3-btn w3-green">{{ __('View PDF') }}</a>
-                      
-                      </div>
                     </div>
-
-                </div>
-                @php 
-                    
-                    
-                    
-                @endphp
-        @endforeach
-        
+                    @php 
+                        
+                        
+                        
+                    @endphp
+            @endforeach
+            
 
 
-        <!--
-          <a href="{{ route('articles.test', ['pdf' => $pdfs, 'titles' => $titles, 'language'=> $languages]) }}" target="_blank" 
-               class="w3-btn pull-left w3-green download">{{ __('Download PDF') }}</a>
-        -->
-        @php 
-        
-            $num = $resultset->getNumFound() / 10;
-            $num++;
-            $endpag = (int) $num;
+            <!--
+              <a href="{{ route('articles.test', ['pdf' => $pdfs, 'titles' => $titles, 'language'=> $languages]) }}" target="_blank" 
+                   class="w3-btn pull-left w3-green download">{{ __('Download PDF') }}</a>
+            -->
+            @php 
+            
+                $num = $resultset->getNumFound() / 10;
+                $num++;
+                $endpag = (int) $num;
+            @endphp
+          
+
+        @php
+            $starts = 1;
+            if ($num < 10)
+                $end = $endpag;
+            else
+                $end = 10;
+            
+          
+        if(!empty($request->start)) {
+            if($request->start - 5 >= 1) {
+                $starts = $request->start - 5;
+            }
+
+            if ($request->start + 4 >= 10 ) { 
+                $end = $request->start + 4;
+            } 
+            if ($request->start + 4 > $endpag)
+                $end = $request->start + ($endpag - $request->start);
+
+            if ($request->start >= (int) $num) {
+                $end = $num;
+            }
+
+        }
         @endphp
-      
-
-    @php
-        $starts = 1;
-        if ($num < 10)
-            $end = $endpag;
-        else
-            $end = 10;
         
-      
-    if(!empty($request->start)) {
-        if($request->start - 5 >= 1) {
-            $starts = $request->start - 5;
-        }
+      <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li>
+          <a href="#" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        @for ($i = $starts; $i <= $end; $i++)
+                @php $params['start'] = $i; @endphp
 
-        if ($request->start + 4 >= 10 ) { 
-            $end = $request->start + 4;
-        } 
-        if ($request->start + 4 > $endpag)
-            $end = $request->start + ($endpag - $request->start);
+                @if($request->start == $i)
+                    <li class="page-item active">
+                        <a class="page-link" href="#">{{$i}} <span class="page-link sr-only">(current)</span></a>
+                    </li>
+                @else 
+                    <li><a href="{{ route('roots', $params) }}">{{$i}}</a></li>
+                @endif
 
-        if ($request->start >= (int) $num) {
-            $end = $num;
-        }
+        @endfor
+        <li>
+          <a href="#" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+        @else
+            <h2 style="text-align:center;">Aucun Résultat Trouvé ... <h2>
+         @endif
+    </div>
 
-    }
-    @endphp
     
-  <nav aria-label="Page navigation">
-  <ul class="pagination">
-    <li>
-      <a href="#" aria-label="Previous">
-        <span aria-hidden="true">&laquo;</span>
-      </a>
-    </li>
-    @for ($i = $starts; $i <= $end; $i++)
-            @php $parameters['start'] = $i; @endphp
+    
+   
+    <div class="widget1 col-md-3">
 
-            @if($request->start == $i)
-                <li class="page-item active">
-                    <a class="page-link" href="#">{{$i}} <span class="page-link sr-only">(current)</span></a>
-                </li>
-            @else 
-                <li><a href="{{ route('roots', $parameters) }}">{{$i}}</a></li>
-            @endif
+       <div class="themes">
+        
+    <br><h4>Themes</h4><br>
+    
+    
+    @foreach($numbers as $subject => $count)
+    @php  $size= (($count/max($numbers))*100); @endphp
+    @if ($count > 0)
+       
+        @if ( $size <= 100 and $size > 95)
+            @php $size = '35px'; @endphp
+        @elseif ( $size <= 95 and $size > 80)
+            @php $size = '28px'; @endphp
+        @elseif ( $size <= 80 and $size > 70)
+            @php $size = '21px'; @endphp
+        @elseif ( $size <= 70 and $size > 60)
+            @php $size = '17px'; @endphp
+        @else
+            @php $size = '10px'; @endphp
+        @endif
+        <a href="{{ route('roots', $parameters3) }}{{$signs3}}theme={{ $subject }}" style="font-size:{{$size}}">{{ $subject }}</a>
+    @endif 
+    @endforeach
 
-    @endfor
-    <li>
-      <a href="#" aria-label="Next">
-        <span aria-hidden="true">&raquo;</span>
-      </a>
-    </li>
-  </ul>
-</nav>
-
-</div>
-</div>
-<!--
-<div class="widget1">
-
-    <div class="themes">
-        <h4>Themes</h4>
-        <a href="#" class="big">Sport</a>
-        <a href="#" class="small">Education</a>
-        <a href="#" class="medium">Fashion</a>
-        <a href="#" class="micro">Politique</a>
-        <a href="#" class="big">Sport</a>
-        <a href="#" class="small">Education</a>
-        <a href="#" class="medium">Fashion</a>
-        <a href="#" class="micro">Politique</a>
     </div>
 
     <div class="calendrier">
-    <h4>Calendrier</h4><br>
-        <form class="form-inline" method="get">
-           <input type="text" name="fromdate" class="form-control" id="dateinput" placeholder="Calendrier" value="{{$choixdate}}" >
-            <button type="submit" class="btn btn-primary"><i class="fa fa-search fa-fw" aria-hidden="true"></i></button> 
+        <h4>Calendrier</h4><br>
+            <form class="form-inline" method="get" action="{{ route('roots', $parameters)}}">
+               <input type="text" name="fromdate" class="form-control" id="dateinput" placeholder="Calendrier" value="{{$choixdate}}" >
+                <button type="submit" class="btn btn-primary"><i class="fa fa-search fa-fw" aria-hidden="true"></i></button> 
 
-             
-        </form>
+            </form>
+            <br>
     </div>
 
     
     
 </div>
--->
-      
     </div>
 
+
+
+      <!-- <h1>{{memory_get_peak_usage() / 1024 / 1024 }}' MB RAM'</h1> -->
+    </div>
+    <script type="text/javascript" src="{{ asset('js/system.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/pdfjs.js') }}"></script>
 <script>
 
 

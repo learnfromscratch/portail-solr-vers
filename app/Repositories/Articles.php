@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use Illuminate\Support\Facades\Auth;
 use App\Theme;
+use Illuminate\Http\Request;
 
 /**
 * 
@@ -123,10 +124,8 @@ class Articles
 
 		$hl->setSimplePrefix('<strong>');
 		$hl->setSimplePostfix('</strong>');
-		if (isset($this->params['language'])) {
-			//session(['language' => $this->params['language']]);
-			$query->createFilterQuery('language')->setQuery('ArticleLanguage:"'.$helper->escapePhrase($this->params['language']).'"');
-		}
+		
+		
 		
 		if (isset($this->params['source'])) {
 			$query->createFilterQuery('source')->setQuery('SourceName:'.$helper->escapePhrase($this->params['source']));
@@ -203,29 +202,34 @@ class Articles
 
 		if (isset($this->params['noneofthis'])) {
 			//dd($this->params['noneofthis']);
+			$exec = '';
 			$array = explode(",",$this->params['noneofthis']);
 
 			
 			foreach($array as $value){
 			
-		  		$thequery2 .= ' NOT "'.$value.'" ';
+		  		$thequery2 .= '"'.$value.'" ';
 			}
+
+
 
 			//dd($thequery);
 			$thequery3 = '('.$thequery2.')';
 			
-
-			$excludequery = $thequery2;
+			foreach ($Textfields as $field) {
+		  		$exec .= " -".$field.":".$thequery3;
+			}
+			$excludequery = $exec;
 
 			//dd($excludequery);
 
-			//$query->createFilterQuery('noneofthis')->setQuery($excludequery);
+			$query->createFilterQuery('noneofthisq')->setQuery($excludequery);
 		}
 
-		if(!empty($this->params['noneofthis']) OR !empty($this->params['allthiswords']) OR !empty($this->params['orwords'])) {
+		if(!empty($this->params['allthiswords']) OR !empty($this->params['orwords'])) {
 			
 			foreach ($Textfields as $field) {
-		  		$allquery .= $field.":(".$andquery."".$orquery."".$excludequery.") ";
+		  		$allquery .= $field.":(".$andquery."".$orquery.") ";
 			}
 			//dd($allquery);
 			$query->setQuery($allquery);
@@ -241,11 +245,24 @@ class Articles
 	 * @param Illuminate\Http\Request $request
 	 * @return array $resultset
 	*/
-	public function index()
+	public function index(Request $request)
 	{
+
 		$query = Articles::baseFilter();
 		$query = Articles::init($query);
+		$helper = $query->getHelper();
+		if ($request->segment(1) == 'fr' ) {
+			$langage = 'French';
+		}
+		elseif ($request->segment(1) == 'en') {
+			$langage='ENGLISH';
+		}
+		else {
+			$langage = 'Arabic';
+		}
 
+			//session(['language' => $this->params['language']]);
+			$query->createFilterQuery('language')->setQuery('ArticleLanguage:'.$helper->escapePhrase($langage));
 		// this executes the query and returns the result
 		return $resultset = $this->client->select($query);
 	}

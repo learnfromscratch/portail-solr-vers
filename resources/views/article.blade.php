@@ -29,13 +29,75 @@
             }
         @endphp
     <div class="container-fluid">
-        <div class="row col-lg-12">
-            <form class="search-form" role="search" action="{{ route('roots') }}" method="get">
+       <div class="rechercher row">
+             <div class="col-md-6 col-md-offset-3">
+        
+        <form class="search-form" role="search" action="{{ route('roots',$params) }}" method="get">
                 <div class="input-group search">
-                    <input type="text" name="data" id="data" placeholder="Recherche" class="form-control input-lg" ng-model="name">
-                    <a  class="input-group-addon w3-blue"><i class="fa fa-search fa-fw" aria-hidden="true"></i></a>
+                    <input type="text" value="{{array_key_exists('data',$params) ? $params['data'] : ''}}" name="data"
+                           id="data" placeholder="Recherche Initial" class="form-control input-lg" ng-model="name">
+                    <button type='submit' class="input-group-addon w3-blue">
+                        <i class="fa fa-search fa-fw" aria-hidden="true"></i>
+                    </button>
+                    <!-- Button trigger modal -->
+
                 </div>
-            </form>
+                    <a class="recherche pull-right" data-toggle="modal" href="#exampleModal">
+                    Recherche Avancée
+                </a>
+
+                
+        </form>
+            <!--<h1>hello :{{session('language')}}</h1>!-->
+
+       
+        </div>
+        
+        </div>
+
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+            <form action="{{ route('roots') }}" method="get">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Recherche Avancée</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        
+                            <div class="form-group">
+                                <label for="recipient-name" class="form-control-label">All these words:</label>
+                                <input data-role="tagsinput" type="text" class="form-control" id="recipient-name" name="allthiswords" value="{{array_key_exists('allthiswords',$params) ? $params['allthiswords'] : ''}}" placeholder='Sépare les mots par virgule (AND)'>
+                            </div>
+                            <div class="form-group">
+                                <label for="message-text" class="form-control-label">This exact word or phrase:</label>
+                                <input type="text" class="form-control" name="phrase_search" id="recipient-name" placeholder='Put exact words in quotes: "rat terrier"'>
+                            </div>
+                            <div class="form-group">
+                                <label for="message-text" class="form-control-label">Any of these words:</label>
+            <input type="text" class="form-control " data-role="tagsinput" id="recipient-name" placeholder="Sépare les mots par virgule (OR)" name="orwords" value="{{array_key_exists('orwords',$params) ? $params['orwords'] : ''}}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="message-text" class="form-control-label">None of these words:</label>
+                                <input type="text" data-role="tagsinput" class="form-control redtags" name="noneofthis" placeholder="Sépare les mots par virgule (exclut)" id="recipient-name" value="{{array_key_exists('noneofthis',$params) ? $params['noneofthis'] : ''}}">
+
+    
+                            
+                            </div>
+
+ 
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Recherche Avancé</button>
+                    </div>
+                </div>
+                </form>
+            </div>
         </div>
 
         <div class="row col-lg-12">
@@ -110,99 +172,7 @@
                     $class = 'arabic';
                 @endphp
             @endif
-            <div class="widget">
-        <em class="number-articles">{{ __('Number of articles : ') }}<i>{{ $resultset->getNumFound() }} </i></em>
-            @if(!empty($params['data']))
             
-            <br><br>
-            <select id="comboA" onchange="getComboA(this)" class="form-control">
-                @if(!empty($params['sort']) and $params['sort'] == 'pertinence')
-                    <option value='pertinence' selected="selected">Relevance</option>
-                @elseif(empty($params['sort']) or $params['sort'] != 'pertinence')
-                    <option value='pertinence'>Relevance</option>
-                @endif
-
-                @if(!empty($params['sort']) and $params['sort'] == 'date')
-                    <option value='date' selected="selected">Newest</option>
-                @elseif(empty($params['sort']) or $params['sort'] != 'date')
-                    <option value='date'>Newest</option>
-                @endif
-                
-            </select>
-        @endif
-        <div class="themes">
-    <h4>Themes</h4><br>
-    @foreach($numbers as $subject => $count)
-    @if ($count > 0)
-                <a href="{{ route('roots', $parameters) }}{{$signs}}theme={{ $subject }}">{{ $subject }}<i>({{$count}})</i></a><br>
-                @endif 
-    @endforeach
-
-    </div><!-- This is custom facade, so I have to code everything-->
-        <div class="keywords">
-            @php
-
-                 $user = Auth::user();
-            @endphp
-        </div>
-        <div class="language">       
-            <h4>{{ __('Filter by Language :') }}</h4><br>
-            @foreach ($facet1 as $value => $count)
-                @if (empty($params['language']))
-                <a href="{{ route('roots', $params) }}{{$sign}}language={{$value}}">{{ $value}}<i>{{$count}}</i></a><br>
-                @elseif ($params['language'] == $value)
-                     <p class="actives">
-                    {{ $value}}
-                     <a href="#" class="closes">
-                        <i class="fa fa-times-circle" aria-hidden="true"></i>
-                     </a>
-                     
-                    </p><br>
-                @endif
-            @endforeach
-        </div>
-        <div class="source">  
-            <h4>{{ __('Filter by Source :') }}</h4><br>
-            @foreach ($facet3 as $value => $count)
-               @if (empty($params['source']))
-
-                    <a href="{{ route('roots', $params)}}{{$sign}}source={{$value}}">{{ $value}}</a><i>{{$count}}</i><br>
-                 @elseif ($params['source'] == $value)
-                    <p class="actives">{{ $value}}<i>{{$count}}</i></p><br>
-                @endif
-            @endforeach
-        </div>
-        
-
-        <div class="days">
-            <h4>5 Derniers Jours</h4>
-
-            @php $today = date("Y-m-d"); @endphp
-            @for($i = 0 ; $i < 5; $i++) 
-                @if($i == 0)
-                    <a href="{{ route('roots', $params) }}{{$signs}}fromdate={{$today}}"> Aujourd'hui</a><br>
-                @elseif ($i == 1)
-                    <a href="{{ route('roots', $params) }}{{$signs}}fromdate={{date('Y-m-d', strtotime($today. '  -'.$i.' day' ))}}"> Hier</a><br>
-                @else
-                    <a href="{{ route('roots', $params) }}{{$signs}}fromdate={{date('Y-m-d', strtotime($today. '  -'.$i.' day' ))}}"> {{date("d-m-Y", strtotime($today. "  -".$i." day" ))}}</a><br>
-                     
-                @endif
-                
-            @endfor
-
-        </div>
-        <br>
-        <div class="calendrier">
-        <h4>Calendrier</h4><br>
-            <form class="form-inline" method="get" action="{{ route('roots', $params)}}">
-               <input type="text" name="fromdate" class="form-control" id="dateinput" placeholder="Calendrier" value="{{$choixdate}}" >
-                <button type="submit" class="btn btn-primary"><i class="fa fa-search fa-fw" aria-hidden="true"></i></button> 
-
-            </form>
-            <br>
-    </div>
-        
-        </div>
                 <div class="row w3-margin-bottom">
                     <div class="media {{$class}}">
                     <!--
@@ -211,39 +181,66 @@
                       </div>
                       -->
                       <div class="media-body">
-                        <!--<h4 class="media-heading w3-xlarge">
+                       
+                        
+                        <div style=" text-align:left; width: 85%;">
+                            <div style=" float: left;">
+                                <i>Source : {{ $document->SourceName }}</i><br>
+                                <i>Publié le {{ $date }}</i>
+                                <p>
+                                Keywords : 
+                                    @foreach($numbers as $key => $count)
+                                        <i class="badge"  >{{$key}}({{$count}})</i>
+                                    @endforeach
+                                </p>
+                            </div>
+                            <a href="{{ $pdf1 }}" target="_blank" class="w3-btn pull-right w3-green">Visualiser pdf</a>
+                        </div>
+
+                       
+<div style="clear:both;">
+                            <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Texte Structué</a></li>
+    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Texte brute</a></li>
+    
+  </ul>
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="home">
+               @php $zoom = 125;@endphp
+    <object type="application/pdf" data="{{$pdf1}}#zoom=135" style="width:1000px; height:1000px;">
+        alt : <a href="{{$pdf1}}">veuillez téléchargez un navigate</a>
+    </object>
+    </div>
+
+    <div role="tabpanel" class="tab-pane" id="profile"> 
+    <br>
+         <h4 class="media-heading w3-xlarge">
                             {{ $doc }}
                             {{ $doc_en }}
                             {{ $doc_fr }}
                             {{ $doc_ar }}
                         </h4>
-                        -->
-                        
-                        
-
-                        <p class="text-center">
-                            <!--
+        <br>                
+        <p style="float:left; text-align:left;">
+                          <pre>  
                             {{ $text }}
                             {{ $text_en }}
                             {{ $text_fr }}
-                            {{ $text_ar }} -->
-<embed src="{{$pdf1}}#page=1&zoom=150" width="800" height="500">
+                            {{ $text_ar }}
+                            </pre> 
+        </p>
+    </div>
+    
+  </div>
+     </div>                   
 
-                            
-                        </p>
-                        <i>Source : {{ $document->Source }}</i><br>
-                        <i>Publié le {{ $date }}</i>
-                        <p>
-                        Keywords : 
-                            @foreach($numbers as $key => $count)
-                                <i class="badge"  >{{$key}}({{$count}})</i>
-                            @endforeach
-                        </p>
-                        <a href="{{ $pdf1 }}" target="_blank" class="w3-btn pull-right w3-green">Visualiser pdf</a>
+     
+                 
+                        
                       </div>
                     </div>
                 </div>
         @endforeach
-
+ 
     </div>
 @endsection

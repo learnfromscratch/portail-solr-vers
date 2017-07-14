@@ -19,6 +19,7 @@ class CheckLanguage
         //dd();
             $locale = $request->segment(1);
             //dd(! in_array($locale, Config::get('app.available_locales')));
+
         if ( ! in_array($locale, Config::get('app.available_locales'))) {
             //$segments = $request->segments(2);
             //dd();
@@ -26,6 +27,9 @@ class CheckLanguage
 
             return redirect('/'.$segments[0].'/?'.$request->getQueryString());
         }
+
+        
+
 
         App::setLocale($locale);
         return $next($request);
