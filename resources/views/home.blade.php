@@ -198,7 +198,7 @@
             <br>
         @endif
         
-     
+        @php $all = 0; @endphp
         <div class="language">       
             <h4>Langue des Articles: </h4><br>
             <!-- do this in the indexation-->
@@ -208,6 +208,7 @@
                     @elseif ($value == 'Arabic')
                         @php $values = 'ar'; @endphp
                     @endif
+                @php $all = $all + $count; @endphp
                 @if(Request::segment(1) == $values)
 
                      <p class="actives">
@@ -223,6 +224,15 @@
                     <a href="http://localhost/portail/public/{{$values}}">{{ $value}}<i>{{$count}}</i></a><br>
                 @endif
             @endforeach
+             @if(Request::segment(1) != 'tous')
+                <a href="http://localhost/portail/public/tous">Tous<i>{{$all}}</i></a><br>
+            @else
+                <p class="actives">
+                    Tous
+                     
+                     
+                    </p>
+            @endif
         </div>
         <div class="source">  
             <h4>{{ __('Filter by Source :') }}</h4><br>
@@ -288,8 +298,10 @@
                 @php $values = "anglais"; @endphp
             @elseif(Request::segment(1) == "fr")
                 @php $values = "Francais"; @endphp
+            @elseif(Request::segment(1) == "tous")
+                 @php $values = " Tous"; @endphp
             @else
-                 @php $values = "Arabe"; @endphp
+                 @php $values = "Arabe"; @endphp    
             @endif
                 <div class="filters" style="display:inline-block;">
                     <span class="param">Langage:{{$values}}</span>

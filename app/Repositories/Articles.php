@@ -251,18 +251,20 @@ class Articles
 		$query = Articles::baseFilter();
 		$query = Articles::init($query);
 		$helper = $query->getHelper();
-		if ($request->segment(1) == 'fr' ) {
-			$langage = 'French';
-		}
-		elseif ($request->segment(1) == 'en') {
-			$langage='ENGLISH';
-		}
-		else {
-			$langage = 'Arabic';
-		}
+		if($request->segment(1) != 'tous' ) {
+			if ($request->segment(1) == 'fr' ) {
+				$langage = 'French';
+			}
+			elseif ($request->segment(1) == 'en') {
+				$langage='ENGLISH';
+			}
+			else {
+				$langage = 'Arabic';
+			}
 
-			//session(['language' => $this->params['language']]);
-			$query->createFilterQuery('language')->setQuery('ArticleLanguage:'.$helper->escapePhrase($langage));
+				//session(['language' => $this->params['language']]);
+				$query->createFilterQuery('language')->setQuery('ArticleLanguage:'.$helper->escapePhrase($langage));
+		}
 		// this executes the query and returns the result
 		return $resultset = $this->client->select($query);
 	}
