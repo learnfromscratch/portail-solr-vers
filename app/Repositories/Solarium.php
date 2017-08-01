@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Repositories;
+use Illuminate\Http\Request;
 
 /**
 * 
@@ -82,7 +83,9 @@ class Solarium
     public function indexed()
     {
         $params = [];
-        $resultset = (new Articles($this->client,$params,1))->index();
+        $request = new Request();
+
+        $resultset = (new Articles($this->client,$params,1,$request))->index();
 
         return $indexed = $resultset->getNumfound();
     }

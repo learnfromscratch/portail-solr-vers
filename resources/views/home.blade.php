@@ -134,24 +134,24 @@
 
 
         <!-- A voir l'optimisation du Code-->
-        @if(!empty($params['start']) and count($params) >= 1)
+        @if(!empty($params['page']) and count($params) >= 1)
                 @php 
-                    $params['start'] = 1; 
+                    $params['page'] = 1; 
                 @endphp
         @endif
-        @if(!empty($parameters['start']) and count($parameters) >= 1)
+        @if(!empty($parameters['page']) and count($parameters) >= 1)
                 @php 
-                    $parameters['start'] = 1; 
+                    $parameters['page'] = 1; 
                 @endphp
         @endif
-        @if(!empty($parameters2['start']) and count($parameters2) >= 1)
+        @if(!empty($parameters2['page']) and count($parameters2) >= 1)
                 @php 
-                    $parameters2['start'] = 1; 
+                    $parameters2['page'] = 1; 
                 @endphp
         @endif
-        @if(!empty($parameters3['start']) and count($parameters3) >= 1)
+        @if(!empty($parameters3['page']) and count($parameters3) >= 1)
                 @php 
-                    $parameters3['start'] = 1; 
+                    $parameters3['page'] = 1; 
                 @endphp
         @endif
         <!--
@@ -163,7 +163,7 @@
 <!--
     <p>Active Filters : <i class="badge"  >English</i><i class="badge"  >Date <a href="#">x</a></i></p>
 -->     <div class="article-widget row">
-        <div class="widget col-md-3">
+        <div class="widget {{App\Miseforme::where('user_id', Auth::id())->first()->nombre_sidebar == 2 ? 'col-md-3' : 'col-md-4'}} " style="background: {{App\Miseforme::where('user_id', Auth::id())->first()->color_widget}}">
         <em class="number-articles">{{ __('Number of articles : ') }}<i>{{ $resultset->getNumFound() }} </i></em>
         <div class="download-pdfs">
             <form method="post" action="{{ route('articles.test')}}" >
@@ -235,7 +235,15 @@
             @endif
         </div>
         <div class="source">  
-            <h4>{{ __('Filter by Source :') }}</h4><br>
+
+             <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Source Imprimé</a></li>
+    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Source Internet</a></li>
+    
+  </ul>
+  <div class="tab-content">
+      
+      <div role="tabpanel" class="tab-pane active" id="home">
             @foreach ($facet3 as $value => $count)
                
                 @if(isset($params['source']) AND $params['source'] == $value)
@@ -251,13 +259,19 @@
                     <a href="{{ route('roots', $params)}}{{$sign}}source={{$value}}">{{ $value}}</a><i>{{$count}}</i><br>
                 @endif
             @endforeach
+    </div>
+    <div role="tabpanel" class="tab-pane" id="profile"> 
+        Bientôt ...
+    </div>
+  </div>
+            
         </div>
-        
+        <br>
         <div class="categories">
 
             <h4>Filtrer par Categorie</h4> <br>
              
-            
+            Bientôt ...
 
         </div>
         <br>
@@ -283,13 +297,47 @@
 
         <br>
         
-
+        <div style="display: {{App\Miseforme::where('user_id', Auth::id())->first()->nombre_sidebar == 2 ? 'none' : 'block'}}">
+     <div class="themes">
+        
+    <h4>Themes</h4>
     
+    
+    @foreach($numbers as $subject => $count)
+    @php  $size= (($count/max($numbers))*100); @endphp
+    @if ($count > 0)
+       
+        @if ( $size <= 100 and $size > 95)
+            @php $size = '35px'; @endphp
+        @elseif ( $size <= 95 and $size > 80)
+            @php $size = '28px'; @endphp
+        @elseif ( $size <= 80 and $size > 70)
+            @php $size = '21px'; @endphp
+        @elseif ( $size <= 70 and $size > 60)
+            @php $size = '17px'; @endphp
+        @else
+            @php $size = '10px'; @endphp
+        @endif
+        <a href="{{ route('roots', $parameters3) }}{{$signs3}}theme={{ $subject }}" style="font-size:{{$size}}">{{ $subject }}</a>
+    @endif 
+    @endforeach
+
+    </div>
+
+    <div class="calendrier">
+        <h4>Calendrier</h4><br>
+            <form class="form-inline" method="get" action="{{ route('roots', $parameters)}}">
+               <input type="text" name="fromdate" class="form-control" id="dateinput" placeholder="Calendrier" value="{{$choixdate}}" >
+                <button type="submit" class="btn btn-primary"><i class="fa fa-search fa-fw" aria-hidden="true"></i></button> 
+
+            </form>
+            <br>
+    </div>
         
         </div>
+        </div>
         
-        
-<div class="articles col-md-6">
+<div class="articles {{App\Miseforme::where('user_id', Auth::id())->first()->nombre_sidebar == 2 ? 'col-md-6' : 'col-md-8'}}">
 
 <div>
             <b>Filtre Active : </b>
@@ -313,6 +361,9 @@
                     
                         @if($param == 'author') 
                             @php $value = urldecode($value); @endphp
+                        @endif
+                        @if($param == 'page') 
+                            @php $value = Request::input('page'); @endphp
                         @endif
                             <span class="param">{{$param}}:</span>  {{$value }}  <a href="javascript:;" onclick="cancellink('{{$param}}');"  class="closes">
                                 <i class="fa fa-times-circle" aria-hidden="true"></i>
@@ -405,12 +456,13 @@
                             </p>
                              
                             
-                                <i><a href="{{ route('roots', $params)}}{{$sign}}source={{$document->SourceName}}">{{ $document->SourceName }}</a></i> : المصدر<br>
+                                <span class="description"> : المصدر</span> <i><a href="{{ route('roots', $params)}}{{$sign}}source={{$document->SourceName}}">{{ $document->SourceName }}</a></i><br>
                                 
-                                 <i><a href="{{ route('roots', $params)}}{{$sign}}author={{$document->Author }}">{{ $document->Author }}</a></i> : الكاتب  
+                                 <span class="description"> : الكاتب</span> <i><a href="{{ route('roots', $params)}}{{$sign}}author={{$document->Author }}">{{ $document->Author }}</a></i>  
                                 @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
                                     <br><i> {{ $document->score }} : التنقيط</i>
                                 @endif
+                                <br><a href="{{ $pdf1 }}" target="_blank" class="w3-btn w3-green">عرض الملف</a>
                             @else
                             <p>
                            
@@ -425,8 +477,9 @@
                                 @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
                                     <br><i>Score {{ $document->score }}</i>
                                 @endif
+                                <br><a href="{{ $pdf1 }}" target="_blank" class="w3-btn w3-green">{{ __('View PDF') }}</a>
                             @endif
-                            <br><a href="{{ $pdf1 }}" target="_blank" class="w3-btn w3-green">{{ __('View PDF') }}</a>
+                            
                           
                           </div>
                         </div>
@@ -446,33 +499,35 @@
                    class="w3-btn pull-left w3-green download">{{ __('Download PDF') }}</a>
             -->
             @php 
-            
-                $num = $resultset->getNumFound() / 10;
+                $nombrePage = App\Miseforme::where('user_id', Auth::id())->first()->article_par_page;
+                $num = $resultset->getNumFound() / $nombrePage;
+
                 $num++;
+                
                 $endpag = (int) $num;
             @endphp
           
 
         @php
-            $starts = 1;
+            $pages = 1;
             if ($num < 10)
                 $end = $endpag;
             else
                 $end = 10;
             
           
-        if(!empty($request->start)) {
-            if($request->start - 5 >= 1) {
-                $starts = $request->start - 5;
+        if(!empty($request->page)) {
+            if($request->page - 5 >= 1) {
+                $pages = $request->page - 5;
             }
 
-            if ($request->start + 4 >= 10 ) { 
-                $end = $request->start + 4;
+            if ($request->page + 4 >= 10 ) { 
+                $end = $request->page + 4;
             } 
-            if ($request->start + 4 > $endpag)
-                $end = $request->start + ($endpag - $request->start);
+            if ($request->page + 4 > $endpag)
+                $end = $request->page + ($endpag - $request->page);
 
-            if ($request->start >= (int) $num) {
+            if ($request->page >= (int) $num) {
                 $end = $num;
             }
 
@@ -486,10 +541,10 @@
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>
-        @for ($i = $starts; $i <= $end; $i++)
-                @php $params['start'] = $i; @endphp
+        @for ($i = $pages; $i <= $end; $i++)
+                @php $params['page'] = $i; @endphp
 
-                @if($request->start == $i)
+                @if($request->page == $i)
                     <li class="page-item active">
                         <a class="page-link" href="#">{{$i}} <span class="page-link sr-only">(current)</span></a>
                     </li>
@@ -513,11 +568,11 @@
     
     
    
-    <div class="widget1 col-md-3">
+    <div class="widget1 col-md-3" style="background: {{App\Miseforme::where('user_id', Auth::id())->first()->color_widget}}; display: {{App\Miseforme::where('user_id', Auth::id())->first()->nombre_sidebar == 2 ? 'block' : 'none'}}">
 
        <div class="themes">
         
-    <br><h4>Themes</h4><br>
+    <h4>Themes</h4>
     
     
     @foreach($numbers as $subject => $count)
@@ -596,7 +651,7 @@
 
         //reverse iteration as may be destructive
         for (var i= pars.length; i-- > 0;) {    
-            //idiom for string.startsWith
+            //idiom for string.pagesWith
             if (pars[i].lastIndexOf(prefix, 0) !== -1) {  
                 pars.splice(i, 1);
             }

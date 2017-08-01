@@ -45,4 +45,7 @@ class User extends Authenticatable
     public function newsletter() {
         return $this->hasOne('App\Newsletter');
     }
+    public function miseforme() {
+        return $this->hasOne('App\Miseforme');
+    }
 }

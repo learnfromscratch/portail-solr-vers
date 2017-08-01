@@ -17,7 +17,16 @@ class GetKeywords
 		$this->user = $user;
 	}
 
+	public function getKeywordsByThemes($themes = [])
+	{
+		$this->querySearcheds = '';
+		foreach ($themes as $theme) {
+			foreach ($theme->keywords as $keyword)
+				$this->querySearcheds .= '"'.$keyword->name.'" ';
+		}
 
+		return $this->querySearcheds;
+	}
 	public function getKeywordsByTheme($theme) {
 
 		$this->querySearcheds = '';

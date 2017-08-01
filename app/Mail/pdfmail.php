@@ -16,9 +16,10 @@ class pdfmail extends Mailable
      *
      * @return void
      */
-    public function __construct($data)
+    public function __construct($data, $name)
     {
         $this->data = $data;
+        $this->name = $name;
     }
 
     /**
@@ -40,9 +41,16 @@ class pdfmail extends Mailable
 
         // after the boucle finishes delete the content of the table
 
-
-        return $this->view('emails.pdf')->attachData($this->data, 'newsletter.pdf', [
-                        'mime' => 'application/pdf',
-                    ]);;
+        $path = $this->data;
+        $name = $this->name;
+        $address = 'm.harbouj@gmail.com';
+        $name = 'Oxdata';
+        $subject = 'Newslettre I-Media';
+        return $this->view('emails.pdf', compact('path','name'))
+                ->from($address, $name) 
+                ->subject($subject);
+                /*->cc($address, $name)
+                ->bcc($address, $name)
+                ->replyTo($address, $name)*/
     }
 }

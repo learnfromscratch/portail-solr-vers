@@ -35,6 +35,8 @@ class notifylaravel extends Command
     {
         parent::__construct();
         $this->client = $client;
+        $this->number = $this->client->select((($this->client->createSelect())->setQuery("*:*")))->getNumFound();
+        
     }
 
     /**
@@ -46,15 +48,16 @@ class notifylaravel extends Command
     {
         $files = new Filesystem;
         $tracker = new Tracker;
-
+        
         $watcher = new Watcher($tracker, $files);
         $listener = $watcher->watch(public_path().'/Articles');
+        $this->client->getPlugin('postbigrequest'); 
 
         $listener->create(function($resource, $path) {
+
             $doc1 = [];
             $buffer = $this->client->getPlugin('bufferedadd');
             $buffer->setBufferSize(50);
-            $this->client->getPlugin('postbigrequest'); 
             if (strtolower(substr($path, strrpos($path, '.') + 1)) == 'xml') 
             {  
                 //sleep(1);         
@@ -78,10 +81,10 @@ class notifylaravel extends Command
                     $i++;
                     
                 }
-                $pdfname = (string) $xml->Record->Document['name'];
+                    //$pdfname = (string) $xml->Record->Document['name'];
                     //$pdfpath = dirname($path)."/".$pdfname;
                     //echo $pdfname. '- ';
-                if ($doc1['Source'] != '') {
+                if ($doc1['Source'] != '' OR $doc1['Title'] != '' OR $doc1['Fulltext'] != '' OR $doc1['SourceName'] != '' OR $doc1['SourceDate'] != '' OR $doc1['ArticleLanguage'] != '') {
                     $id_doc = preg_replace(['/_/', '/\s+/'], '', basename($path, '.xml'));
                     $doc1['id'] = $id_doc;
                     //echo $id_doc .' - ';
@@ -121,8 +124,17 @@ class notifylaravel extends Command
                     $buffer->commit();
                     //HomeController::notifyUser($id_doc,$title,$pdfpath,$this->client,$language);
                     echo 'File created: '.$path.PHP_EOL;
+                    //dd($this->number);
                 }else {
-                     \Mail::to('admin@oxdata.ma')->send(new ErrorMails($path));
+
+                    $arr = [];
+                    foreach ($doc1 as $key => $value) {
+                        if($value == '')
+                            array_push($arr, $key);
+                    }
+
+                    dd($arr);
+                     //\Mail::to('admin@oxdata.ma')->send(new ErrorMails($path));
 
                 }
             }

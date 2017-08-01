@@ -22,7 +22,7 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/sweetalert2/6.4.4/sweetalert2.min.css">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 
@@ -43,7 +43,7 @@
      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.js"></script>
 </head>
-<body>
+<body style="background: {{App\Miseforme::where('user_id', Auth::id())->first()->color_background}}">
    
     <div id="">
     
@@ -84,7 +84,7 @@
                             </a>
 
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href=""><i class="fa fa-user-o fa-lg fa-fw"></i> Mon profil</a></li>
+                                <li><a href="{{route('parametres.show')}}"><i class="fa fa-user-o fa-lg fa-fw"></i> Paramétres</a></li>
 
 
                                   @if (Auth::user()->role_id === 1)

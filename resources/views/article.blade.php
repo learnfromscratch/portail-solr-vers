@@ -162,14 +162,19 @@
                 $text = $document->Fulltext;
             }
             $class = '';
+            $textestucture = 'Texte Structuré';
+                $texte = "Texte Brute";
             @endphp
                <!-- 
                {{$dateme}} <br>
                {{$date}} 
                -->
+               
                 @if($document->ArticleLanguage ==  "Arabic") 
                 @php 
                     $class = 'arabic';
+                    $textestucture = 'نص منظم';
+                    $texte = 'نص عادي';
                 @endphp
             @endif
             
@@ -183,43 +188,52 @@
                       <div class="media-body">
                        
                         
-                        <div style=" text-align:left; width: 85%;">
-                            <div style=" float: left;">
+                        <div class="article">
+                            <div >
                                 <i>Source : {{ $document->SourceName }}</i><br>
                                 <i>Publié le {{ $date }}</i>
                                 <p>
-                                Keywords : 
+                                Themes : 
                                     @foreach($numbers as $key => $count)
-                                        <i class="badge"  >{{$key}}({{$count}})</i>
+                                        @if($count > 0) 
+                                            <i class="badge"  >{{$key}}({{$count}})</i>
+                                        @endif
                                     @endforeach
                                 </p>
+                                
                             </div>
-                            <a href="{{ $pdf1 }}" target="_blank" class="w3-btn pull-right w3-green">Visualiser pdf</a>
+                            
                         </div>
 
                        
-<div style="clear:both;">
-                            <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Texte Structué</a></li>
-    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Texte brute</a></li>
+<div class="article" style="">
+                            <ul class="nav nav-tabs {{$class}}" role="tablist">
+    <li role="presentation" class="active"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">{{$texte}}</a></li>
+    <li role="presentation" ><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{$textestucture}}</a></li>
     
+    <li role="presentation"><a href="{{ $pdf1 }}" class="w3-btn pull-right w3-green" download>Télécharger le PDF</a></li>
   </ul>
   <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="home">
-               @php $zoom = 125;@endphp
-    <object type="application/pdf" data="{{$pdf1}}#zoom=135" style="width:1000px; height:1000px;">
-        alt : <a href="{{$pdf1}}">veuillez téléchargez un navigate</a>
-    </object>
+    <div role="tabpanel" class="tab-pane" id="home">
+                   
+        <object class="pdfobject" type="application/pdf" data="{{$pdf1}}#zoom=135" style="width:1100px; height:1000px;">
+            alt : <a href="{{$pdf1}}" download>Télécharger le texte structué</a>
+        </object>
+        <!--
+        <object class="pdfobject1" type="application/pdf" data="{{$pdf1}}" style="width:900px; height:1000px;">
+            alt : <a href="{{$pdf1}}">veuillez téléchargez un navigate</a>
+        </object>
+        -->
     </div>
 
-    <div role="tabpanel" class="tab-pane" id="profile"> 
+    <div role="tabpanel" class="tab-pane active" id="profile"> 
     <br>
-         <h4 class="media-heading w3-xlarge">
-                            {{ $doc }}
-                            {{ $doc_en }}
-                            {{ $doc_fr }}
-                            {{ $doc_ar }}
-                        </h4>
+        <h4 class="media-heading w3-xlarge">
+            {{ $doc }}
+            {{ $doc_en }}
+            {{ $doc_fr }}
+            {{ $doc_ar }}
+        </h4>
         <br>                
         <p style="float:left; text-align:left;">
                           <pre>  

@@ -54,6 +54,17 @@ Route::group(['prefix' => $locale], function () {
         Route::get('/{id}', 'HomeController@show')->name('articles.show');
 
        
+Route::get('/parametres/account','ParametresController@show')->name('parametres.show');
+Route::post('/parametres/account','ParametresController@update')->name('parametres.update');
+
+Route::get('/parametres/miseforme','ParametresController@view')->name('parametres.view');
+Route::post('/parametres/miseforme','ParametresController@updatemiseforme')->name('parametres.updateforme');
+
+Route::get('/parametres/newslettre','NewslettreController@show')->name('newslettre.show');
+Route::post('/parametres/newslettre','NewslettreController@update')->name('newslettre.update');
+
+Route::get('/parametres/password','PasswordController@show')->name('password.show');
+Route::post('/parametres/password','PasswordController@update')->name('password.update');
 
 Route::get('/client/{id}/admin', 'GroupeController@admin')->name('client.admin');
 Route::post('/groupes/store', 'SousGroupeController@store')->name('sousGroupes.store');

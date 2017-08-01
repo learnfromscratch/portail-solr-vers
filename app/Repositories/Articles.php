@@ -5,7 +5,7 @@ namespace App\Repositories;
 use Illuminate\Support\Facades\Auth;
 use App\Theme;
 use Illuminate\Http\Request;
-
+use App\Miseforme;
 /**
 * 
 */
@@ -13,11 +13,12 @@ class Articles
 {
 	protected $client;
 	
-	function __construct($client, $params, $start)
+	function __construct($client, $params, $page,$request)
 	{
 		$this->client = $client;
 		$this->params = $params;
-		$this->start = ($start - 1)*10;
+		$this->page = $page;
+		$this->request = $request;
 	}
 
 	public function baseFilter() {
@@ -27,8 +28,11 @@ class Articles
 		if (Auth::user()->groupe->id === 1)
     			$querySearched = '*:* ';
   
-    	else
-			$querySearched = (new GetKeywords(Auth::user()))->get();
+    	else {
+    		$user = Auth::user();
+    		$themes = $user->groupe->themes;
+			$querySearched = (new GetKeywords($user))->getKeywordsByThemes($themes);
+    	}
 
 		
 //dd($querySearched);
@@ -67,6 +71,9 @@ class Articles
 	}
 	public function init($query)
 	{
+		$nombreacticle = Miseforme::where('user_id', Auth::id())->first()->article_par_page;
+		$this->page = ($this->page - 1)*$nombreacticle;
+		//dd($this->page);
 		$helper = $query->getHelper();
 		$Textfields = ['Title_en', 'Title_fr', 'Title_ar' ,'Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
 
@@ -109,8 +116,8 @@ class Articles
 			//dd($edismax);
 			
 		}
-
-		$query->setStart($this->start)->setRows(10);
+		
+		$query->setStart($this->page)->setRows($nombreacticle);
 
 
 		// get the facetset component
@@ -245,17 +252,17 @@ class Articles
 	 * @param Illuminate\Http\Request $request
 	 * @return array $resultset
 	*/
-	public function index(Request $request)
+	public function index()
 	{
 
 		$query = Articles::baseFilter();
 		$query = Articles::init($query);
 		$helper = $query->getHelper();
-		if($request->segment(1) != 'tous' ) {
-			if ($request->segment(1) == 'fr' ) {
+		if($this->request->segment(1) != 'tous' ) {
+			if ($this->request->segment(1) == 'fr' ) {
 				$langage = 'French';
 			}
-			elseif ($request->segment(1) == 'en') {
+			elseif ($this->request->segment(1) == 'en') {
 				$langage='ENGLISH';
 			}
 			else {

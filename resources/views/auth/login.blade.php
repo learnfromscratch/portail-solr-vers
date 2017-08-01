@@ -62,8 +62,8 @@
                                 <div class="form-group">
                                     <select class="form-control" id="exampleSelect1" name="language">
                                       <option value="ar">Arabe</option>
-                                      <option value="fr" selected>Francais</option>
-                                      <option value="en">Anglais</option>
+                                      <option value="fr" >Francais</option>
+                                      <option value="en" selected>Anglais</option>
                                     </select>
                                 </div>
                                 <div class="form-group clearfix">

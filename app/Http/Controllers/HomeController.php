@@ -9,6 +9,7 @@ use App\ConcatPdf;
 use Illuminate\Support\Facades\Auth;
 use App\Services\Notification;
 use App\User;
+use App\Newsletter;
 use  Illuminate\Support\Facades\Redis;
 use App\Events\Alert;
 use Illuminate\Support\Facades\DB;
@@ -52,6 +53,8 @@ class HomeController extends Controller
       dd($id);
       */
       //dd($request->segment(1));
+
+        
         $keys = [];
         $counts = [];
         $Textfields = ['Title','Title_en', 'Title_fr', 'Title_ar' ,'Fulltext','Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
@@ -64,31 +67,43 @@ class HomeController extends Controller
             $sign="&";
 
         
-       if(empty($request->start))
-            $start = 1;
+       if(empty($request->page))
+            $page = 1;
         else
-            $start = $request->start;
+            $page = $request->page;
 
         $folderPdfs = "Articles";
-        $query = (new Articles($this->client,$params,$start))->baseFilter();
+        $query = (new Articles($this->client,$params,$page,$request))->baseFilter();
         $resultset = $this->client->select($query);
 
-         //$result = (new Articles($this->client,$params,$start))->all();
+         //$result = (new Articles($this->client,$params,$page,$request))->all();
         $facet1 = $resultset->getFacetSet()->getFacet('language');
         //$facet2 = $resultset->getFacetSet()->getFacet('author');
         
         $facet4 = $resultset->getFacetSet()->getFacet('date');
 
-        //$query1 = $resultset = (new Articles($this->client,$params,$start))->init();
-        $resultset = (new Articles($this->client,$params,$start))->index($request);
+        //$query1 = $resultset = (new Articles($this->client,$params,$page,$request))->init();
+        $resultset = (new Articles($this->client,$params,$page,$request))->index();
 
-        //$query = (new Articles($this->client,$params,$start))->init($query);
+        //$query = (new Articles($this->client,$params,$page,$request))->init($query);
        $facet3 = $resultset->getFacetSet()->getFacet('source');
-       //$query = (new Articles($this->client,$params,$start))->init();
+       //$query = (new Articles($this->client,$params,$page,$request))->init();
        $helper = $query->getHelper();
         $keywordfacet = [];
        
        $user = Auth::user();
+
+       
+       //$filtredUsers = User::all()->whereIn('id',)->all();
+
+       /*
+       $filtredUsers = User::all()->filter(function($value,$key){
+          return in_array($value->id,[10,5,11]);
+       });*/
+       
+         
+       
+
         if ($user->groupe->id === 1) {
             $themes = Theme::all();
         } 
@@ -99,7 +114,7 @@ class HomeController extends Controller
         else {
             $themes = $user->groupe->themes;
         }
-
+        
         //$query1 = $this->client->createSelect();
         /*
         $query->setFields([
@@ -180,7 +195,7 @@ class HomeController extends Controller
         
         // this executes the query and returns the result
          
-        $query = (new Articles($this->client,$params,1))->show();  
+        $query = (new Articles($this->client,$params,1,$request))->show();  
         $helper = $query->getHelper();
 
         //$thequery = 'id:"'.$request->id.'"';

@@ -8,6 +8,11 @@ use App\ConcatPdf;
 use App\Mail\pdfmail;
 use App\User;
 use Mail;
+use App\Theme;
+use App\Newsletter;
+use App\createpdf;
+use App\Repositories\GetKeywords;
+
 
 class DailyNews extends Command
 {
@@ -30,9 +35,10 @@ class DailyNews extends Command
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(\Solarium\Client $client)
     {
         parent::__construct();
+        $this->client = $client;
     }
 
     /**
@@ -42,67 +48,126 @@ class DailyNews extends Command
      */
     public function handle()
     {
-        $users = User::all();
-            // send mails by chunks
+        // récupérer la date du jour
+        $date = date('Y-m-d', strtotime('-5 days'));
+       
+        $date = '2017-08-10';
+        // voir s'il y'a de nouveau mails à envoyer
+        $news = Newsletter::where([['date_envoie_newslettre','=', $date],['envoi_newslettre',true]])->get();
+        //dd($news->isNotEmpty());
+        //dd($news);
+        // s'il y'a des mails à envoyer
+        if($news->isNotEmpty()) {
+            $query = $this->client->createSelect();
+            $this->client->getPlugin('postbigrequest');
+            $Textfields = ['Title_en', 'Title_fr', 'Title_ar','Fulltext_en','Fulltext_fr', 'Fulltext_ar'];
 
-            foreach ($users as $user) {
-                $paths = [];
-                $titles = [];
-                $news = DB::table('news')->where('doc_user_id', '=', $user->id)
-                                         ->get();
-                //echo $news;
-                if($news->isNotEmpty()) {
-                foreach ($news as $new) {
-                    array_push($paths, $new->doc_path);
-                    array_push($titles, $new->doc_title);
-                }
-         $pdf = new ConcatPdf;
-            $pdf->SetFont('dejavusans', '', 12);       
-         $pdf->setFiles($paths);
-        $pdf->addPage();
-        //$pdf->SetFont('Times','',12);
 
-        $pdf->Cell(200,10,'Table Of Contents',0,1,'C');
-        $pdf->Cell(5,5,'',0,1,'L',false);
-        $pdf->concat2();
-                //$pdf->useTemplate($tplIdx);
-        $pdf->SetTitle('newsLetter ITELSYS');
-        //$pdf->SetKeywords('Fed, simo harbouj');
-        //$page = 1; 
-        $number = ceil(count($paths)/24);
+          foreach ($news as $value) {
+            
+            if($value->periode_newslettre == 'chaque jour') {
+                $fromdate = $date.'T00:00:00Z';
+                $dateplus = date('Y-m-d', strtotime('+1 days'));
 
-         $start=$number+1;
-        for ($pageNo = 1; $pageNo <= count($paths); $pageNo++) { // nombre de documents
-            $pageCount = $pdf->setSourceFile($paths[$pageNo-1]);
-            //$pageCount = $pdf->setSourceFile($value);
+                $query->createFilterQuery('fromdate')->setQuery('SourceDate:"'.$fromdate.'"');
 
-            if ($pageNo == 1){
-                $pdf->links[$pageNo]['p'] = $start;
-                $startpage = $pageCount + $start;
+                $value->date_envoie_newslettre = $dateplus;
+                $value->save();
+                
             }
+
+            elseif($value->periode_newslettre == 'chaque semaine') {
+                // execute range date fromdate->date du jour - 7 to endDate : date du jour : return articles
+                $fromdate = date('Y-m-d', strtotime('-6 days')).'T00:00:00Z';
+                $todate = date('Y-m-d').'T00:00:00Z';
+                $dateplus = date('Y-m-d', strtotime('+7 days'));
+
+                $query->createFilterQuery('fromdate')->setQuery('SourceDate:['.$fromdate.' TO '.$todate.']');
+
+                 $value->date_envoie_newslettre = $dateplus;
+                $value->save();
+            }
+
+            elseif($value->periode_newslettre == 'chaque mois') {
+                $fromdate = date('Y-m-d', strtotime('-29 days')).'T00:00:00Z';
+                $todate = date('Y-m-d').'T00:00:00Z';
+                $dateplus = date('Y-m-d', strtotime('+30 days'));
+
+                $query->createFilterQuery('fromdate')->setQuery('SourceDate:['.$fromdate.' TO '.$todate.']');
+
+                $value->date_envoie_newslettre = $dateplus;
+                $value->save();
+            }
+            //dd($query);
+            //dd($value->user_id)
+            
+            $user = User::find($value->user_id);
+            //dd($user->name);
+            if ($user->groupe->id === 1) {
+                $themes = Theme::all();
+            } 
+            elseif ($user->role->name === 'Admin') {
+                $themes = $user->groupe->themes;
+            }
+            
             else {
-                $pdf->links[$pageNo]['p'] = $startpage;
-                 $startpage = $startpage + $pageCount; 
+                $themes = $user->groupe->themes;
             }
 
-            if (isset($pdf->links[$pageNo])) {     
-              //$convertedString = iconv('ISO-8859-1', 'UTF-8//IGNORE',);
-             // $strp_txt = iconv('UTF-8', 'windows-1252', $titles[$pageNo-1]);
-                $pdf->Cell(180,5,$titles[$pageNo-1],0,0,'L',false,$pageNo);
+            //dd($themes->isNotEmpty());
 
+            if($themes->isNotEmpty()) {
+                $pdfs = [];
+                $titles = [];
+                $languages = [];
+                $keywor = new GetKeywords($user);
+                       
+                $thequery = "";
+                // get keywords execute         
+                $keywos = $keywor->getKeywordsByThemes($themes);
+                //dd($keywos);
+                foreach ($Textfields as $values) {
+                    $thequery .= $values.':('.$keywos.') ';
+                }
 
-                $pdf->Cell(5,5,$pdf->links[$pageNo]['p'],0,1,'R',false); 
-                $pdf->Cell(5,5,'',0,1,'L',false);
+                $query->setQuery($thequery);
+                $resultset = $this->client->select($query);
+
+                //dd($resultset->getNumFound());
+                
+                foreach ($resultset as $document) {
+                    if(!empty($document->Title_en)) {
+                        $field = 'Title_en';
+                        $title = $document->Title_en;
+                    }
+                    if(!empty($document->Title_fr)){
+                        $field = 'Title_fr';
+                        $title = $document->Title_fr;
+                    }
+                    if(!empty($document->Title_ar)){
+                        $field = 'Title_ar';
+                        $title = $document->Title_ar;
+                    }
+                    array_push($pdfs, $document->document);
+                    array_push($titles, $title);
+                    array_push($languages, $document->ArticleLanguage);
+                }
+                // send email
+                $downpdf = new createpdf($languages,$pdfs,$titles,$user,$value);
+                $downpdf->createpdfs();  
             }
-        }
+            
 
-                //print_r($pdf->links);
-                $pdf->concat();
-                $data = $pdf->Output('concat.pdf', 'S');
-                \Mail::to($user)->send(new pdfmail($data));
-        
-            }
-           }
-           DB::table('news')->truncate();
+            
+
+            // if $value->periode = 'chaque jour'  => update $value->periode = $date + 1
+            // 'chaque semaine' => $date + 7
+            // 'chaque mois' => $date + 30
+
+
+
+          }
+       }
+
     }
 }

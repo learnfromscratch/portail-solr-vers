@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use App\Abonnement;
 use App\Keyword;
-
+use App\Newsletter;
+use App\Miseforme;
 class RegisterController extends Controller
 {
     /*
@@ -78,12 +79,27 @@ class RegisterController extends Controller
             'role_id' => $data['role_id'],
             'sous_groupe_id' => $sousgroupe
         ]);
+        //dd($user->id);
 
+        Newsletter::create([
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'periode_newslettre' => 'chaque semaine',
+            'date_envoie_newslettre' => date('Y-m-d', strtotime('+7 days')),
+            'envoi_newslettre' => 1
+        ]);
+
+        Miseforme::create([
+            'user_id' => $user->id
+
+        ]);
         // if (isset($data['sous_groupe_id']))
         // {
         //     $user->sous_groupe_id = $data['sous_groupe_id'];
         //     $user->save();
         // }
+
+        //return $user;
 
     }
 }

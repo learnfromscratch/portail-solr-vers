@@ -46,13 +46,8 @@ class Kernel extends ConsoleKernel
         })->everyMinute();*/
         //$schedule->command(DailyNews::class, ['--force'])->everyMinute();
 
-        /*
-        $schedule->command('command:SendMail')->everyMinute()->withoutOverlapping()->when(function(){
-            $news = DB::table('news')->get();
-            return($news->isNotEmpty());
-
-        });
-        */
+        // daily()
+        $schedule->command('command:SendMail')->everyMinute();
     }
 
     /**

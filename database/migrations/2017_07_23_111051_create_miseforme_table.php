@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateNewslettersTable extends Migration
+class CreateMiseformeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,13 @@ class CreateNewslettersTable extends Migration
      */
     public function up()
     {
-        Schema::create('newsletters', function (Blueprint $table) {
+        Schema::create('miseformes', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->string('email');
-            $table->string('periode_newslettre');
-            $table->date('date_envoie_newslettre');
-            $table->boolean('envoi_newslettre')->default(false);
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->integer('nombre_sidebar')->default(2);
+            $table->integer('article_par_page')->default(10);
+            $table->string('color_background')->default('#f5f8fa');
+            $table->string('color_widget')->default('#f5f8fa');
             $table->timestamps();
         });
     }
@@ -32,6 +31,6 @@ class CreateNewslettersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('newsletters');
+        Schema::dropIfExists('miseformes');
     }
 }
