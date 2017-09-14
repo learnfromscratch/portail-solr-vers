@@ -23,7 +23,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/sweetalert2/6.4.4/sweetalert2.min.css">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-    
+    <link rel="stylesheet" href="{{ asset('css/datepicker.min.css') }}">
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 
 <link rel="stylesheet" href="{{ asset('css/bootstrap-tags.css') }}">
@@ -40,8 +40,10 @@
             'csrfToken' => csrf_token(),
         ]) !!};
     </script>
+    <!--
      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.js"></script>
+    -->
 </head>
 <body style="background: {{App\Miseforme::where('user_id', Auth::id())->first()->color_background}}">
    
@@ -63,7 +65,7 @@
                     </button>
 
                     <!-- Branding Image -->
-                    <a class="navbar-brand" href="/portail/public/{{Request::segment(1)}}">
+                    <a class="navbar-brand" href="/portail-solr-vers/public/{{Request::segment(1)}}">
                         {{ config('app.name') }}
                     </a>
                 </div>
@@ -132,6 +134,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="{{ asset('js/datepicker.min.js') }}"></script>
    <script src="{{ asset('js/bootstrap-tags.min.js') }}"></script>
     <script type="text/javascript">
         $('.input-daterange').datepicker({
@@ -139,6 +142,11 @@
         format: 'yyyy-mm-dd'
 });
         $('#dateinput').datepicker({
+            todayHighlight: true,
+             format: 'yyyy-mm-dd'
+});
+
+         $('#dateinput1').datepicker({
             todayHighlight: true,
              format: 'yyyy-mm-dd'
 });

@@ -123,7 +123,7 @@ use App\Mail\pdfmail;
          $date = date('d-m-Y');
          $pdf->Output(public_path().'\mailedPdfs\Revue de Presse_'.$date.'_'.$this->user->name.'_.pdf', 'F');
          
-         \Mail::to($this->email)->send(new pdfmail('http://localhost\portail\public\mailedPdfs\Revue de Presse_'.$date.'_'.$this->user->name.'_.pdf', $this->user->name));
+         \Mail::to($this->email)->send(new pdfmail('http://192.168.1.253/portail-solr-vers/public/mailedPdfs/Revue de Presse_'.$date.'_'.$this->user->name.'_.pdf', $this->user->name));
     }
 
 }

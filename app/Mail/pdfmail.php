@@ -44,10 +44,10 @@ class pdfmail extends Mailable
         $path = $this->data;
         $name = $this->name;
         $address = 'm.harbouj@gmail.com';
-        $name = 'Oxdata';
+        $from = 'Oxdata';
         $subject = 'Newslettre I-Media';
         return $this->view('emails.pdf', compact('path','name'))
-                ->from($address, $name) 
+                ->from($address, $from) 
                 ->subject($subject);
                 /*->cc($address, $name)
                 ->bcc($address, $name)

@@ -34,7 +34,7 @@
         
         <form class="search-form" role="search" action="{{ route('roots',$params) }}" method="get">
                 <div class="input-group search">
-                    <input type="text" value="{{array_key_exists('data',$params) ? $params['data'] : ''}}" name="data"
+                    <input type="text" value="{{ array_key_exists('data',$params) ? $params['data'] : '' }}" name="data"
                            id="data" placeholder="Recherche Initial" class="form-control input-lg" ng-model="name">
                     <button type='submit' class="input-group-addon w3-blue">
                         <i class="fa fa-search fa-fw" aria-hidden="true"></i>
@@ -48,7 +48,7 @@
 
                 
         </form>
-            <!--<h1>hello :{{session('language')}}</h1>!-->
+            <!--<h1>hello :{{ session('language') }}</h1>!-->
 
        
         </div>
@@ -68,21 +68,18 @@
                     <div class="modal-body">
                         
                             <div class="form-group">
-                                <label for="recipient-name" class="form-control-label">All these words:</label>
-                                <input data-role="tagsinput" type="text" class="form-control" id="recipient-name" name="allthiswords" value="{{array_key_exists('allthiswords',$params) ? $params['allthiswords'] : ''}}" placeholder='Sépare les mots par virgule (AND)'>
+                                <label for="recipient-name" class="form-control-label">Tous ces Mots :</label>
+                                <input data-role="tagsinput" type="text" class="form-control" id="recipient-name" name="allthiswords" value="{{ array_key_exists('allthiswords',$params) ? $params['allthiswords'] : '' }}" placeholder='Séparez les mots par virgule (AND)'>
                             </div>
+                            
                             <div class="form-group">
-                                <label for="message-text" class="form-control-label">This exact word or phrase:</label>
-                                <input type="text" class="form-control" name="phrase_search" id="recipient-name" placeholder='Put exact words in quotes: "rat terrier"'>
-                            </div>
-                            <div class="form-group">
-                                <label for="message-text" class="form-control-label">Any of these words:</label>
-            <input type="text" class="form-control " data-role="tagsinput" id="recipient-name" placeholder="Sépare les mots par virgule (OR)" name="orwords" value="{{array_key_exists('orwords',$params) ? $params['orwords'] : ''}}">
+                                <label for="message-text" class="form-control-label">L'un de ces mots:</label>
+            <input type="text" class="form-control " data-role="tagsinput" id="recipient-name" placeholder="Séparez les mots par virgule (OR)" name="orwords" value="{{ array_key_exists('orwords',$params) ? $params['orwords'] : '' }}">
                             </div>
 
                             <div class="form-group">
-                                <label for="message-text" class="form-control-label">None of these words:</label>
-                                <input type="text" data-role="tagsinput" class="form-control redtags" name="noneofthis" placeholder="Sépare les mots par virgule (exclut)" id="recipient-name" value="{{array_key_exists('noneofthis',$params) ? $params['noneofthis'] : ''}}">
+                                <label for="message-text" class="form-control-label">Aucun de ces mots:</label>
+                                <input type="text" data-role="tagsinput" class="form-control redtags" name="noneofthis" placeholder="Séparez les mots par virgule (les mots à exclure)" id="recipient-name" value="{{ array_key_exists('noneofthis',$params) ? $params['noneofthis'] : '' }}">
 
     
                             
@@ -114,7 +111,7 @@
           $array = $resultset->getDocuments();
           $mom = $array[0]->getFields();
         @endphp
-       <!--  {{$array[0]->getFields()['id']}}-->
+       <!--  {{ $array[0]->getFields()['id'] }}-->
         @foreach ($resultset as $document)
 
             @php
@@ -133,9 +130,9 @@
 
             @endphp
             <!--
-            date source : <strong>{{$date}} </strong> <br>
-            date source + 3 mois :<strong> {{$dateme}} </strong> <br>
-            date du jour :<strong>{{$datenow}}</strong>
+            date source : <strong>{{ $date }} </strong> <br>
+            date source + 3 mois :<strong> {{ $dateme }} </strong> <br>
+            date du jour :<strong>{{ $datenow }}</strong>
             -->
             @php
             if ($datenows > $date3mois) {
@@ -166,8 +163,8 @@
                 $texte = "Texte Brute";
             @endphp
                <!-- 
-               {{$dateme}} <br>
-               {{$date}} 
+               {{ $dateme }} <br>
+               {{ $date }} 
                -->
                
                 @if($document->ArticleLanguage ==  "Arabic") 
@@ -179,7 +176,7 @@
             @endif
             
                 <div class="row w3-margin-bottom">
-                    <div class="media {{$class}}">
+                    <div class="media {{ $class }}">
                     <!--
                       <div class="media-left">
                         <img src="https://www.heighpubs.org/articleIcons/0423042031704article-icon[1].png" class="media-object" style="width:90px">
@@ -196,7 +193,7 @@
                                 Themes : 
                                     @foreach($numbers as $key => $count)
                                         @if($count > 0) 
-                                            <i class="badge"  >{{$key}}({{$count}})</i>
+                                            <i class="badge"  >{{ $key }}({{ $count }})</i>
                                         @endif
                                     @endforeach
                                 </p>
@@ -207,21 +204,21 @@
 
                        
 <div class="article" style="">
-                            <ul class="nav nav-tabs {{$class}}" role="tablist">
-    <li role="presentation" class="active"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">{{$texte}}</a></li>
-    <li role="presentation" ><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{$textestucture}}</a></li>
+                            <ul class="nav nav-tabs {{ $class }}" role="tablist">
+    <li role="presentation" class="active"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">{{ $texte }}</a></li>
+    <li role="presentation" ><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ $textestucture }}</a></li>
     
-    <li role="presentation"><a href="{{ $pdf1 }}" class="w3-btn pull-right w3-green" download>Télécharger le PDF</a></li>
+    <li role="presentation" class="telecharger-article"><a href="{{ $pdf1 }}" class="w3-btn pull-right w3-green" download>Télécharger le PDF</a></li>
   </ul>
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane" id="home">
                    
-        <object class="pdfobject" type="application/pdf" data="{{$pdf1}}#zoom=135" style="width:1100px; height:1000px;">
-            alt : <a href="{{$pdf1}}" download>Télécharger le texte structué</a>
+        <object class="pdfobject" type="application/pdf" data="{{ $pdf1 }}#zoom=135" style="width:1100px; height:1000px;">
+            alt : <a href="{{ $pdf1 }}" download>Télécharger le texte structué</a>
         </object>
         <!--
-        <object class="pdfobject1" type="application/pdf" data="{{$pdf1}}" style="width:900px; height:1000px;">
-            alt : <a href="{{$pdf1}}">veuillez téléchargez un navigate</a>
+        <object class="pdfobject1" type="application/pdf" data="{{ $pdf1 }}" style="width:900px; height:1000px;">
+            alt : <a href="{{ $pdf1 }}">veuillez téléchargez un navigate</a>
         </object>
         -->
     </div>
@@ -235,7 +232,7 @@
             {{ $doc_ar }}
         </h4>
         <br>                
-        <p style="float:left; text-align:left;">
+        <p style="float:left; text-align:left; ">
                           <pre>  
                             {{ $text }}
                             {{ $text_en }}

@@ -51,7 +51,7 @@ class DailyNews extends Command
         // récupérer la date du jour
         $date = date('Y-m-d', strtotime('-5 days'));
        
-        $date = '2017-08-10';
+        $date = '2017-08-02';
         // voir s'il y'a de nouveau mails à envoyer
         $news = Newsletter::where([['date_envoie_newslettre','=', $date],['envoi_newslettre',true]])->get();
         //dd($news->isNotEmpty());

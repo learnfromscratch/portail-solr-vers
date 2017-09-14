@@ -260,7 +260,7 @@ class Articles
 		$helper = $query->getHelper();
 		if($this->request->segment(1) != 'tous' ) {
 			if ($this->request->segment(1) == 'fr' ) {
-				$langage = 'French';
+				$langage = 'FRENCH';
 			}
 			elseif ($this->request->segment(1) == 'en') {
 				$langage='ENGLISH';

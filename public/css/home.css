@@ -1,5 +1,5 @@
-  @import url(https://fonts.googleapis.com/earlyaccess/droidarabicnaskh.css);
-  /*font-family: 'Droid Arabic Naskh', serif;*/
+@import url(http://fonts.googleapis.com/earlyaccess/amiri.css);
+
   
 body, html {
 	font-family: "Raleway", sans-serif;
@@ -173,10 +173,10 @@ nav[aria-label="Page navigation"] {
 	float:right;
 }
 .widget a, .widget1 a {
-	font-size: 14px;
+	/*font-size: 14px;*/
     text-decoration: none;
     color: #009f9f;
-    font-style: italic;
+    /*font-style: italic;*/
 }
 .widget .keywords, .widget .source, .widget .language, .widget1 .themes, .widget1 .calendrier {
 	
@@ -258,8 +258,11 @@ pre {
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
     word-break: keep-all;
-    font-family: cursive;
-    font-size: 15px;
+    font-family: "Raleway", sans-serif;
+    font-size: 17px;
+}
+.telecharger-article {
+    float: right !important;
 }
 .recherche {
 	
@@ -302,3 +305,4 @@ pre {
 object {
     /*background: red;*/
 }
+

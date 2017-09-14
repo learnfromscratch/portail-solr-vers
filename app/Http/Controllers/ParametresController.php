@@ -13,6 +13,7 @@ class ParametresController extends Controller
     public function show() {
     	$user = User::find(Auth::id());
     	$string = 'account';
+        //dd($user);
     	return view('parametres.account', compact('string','user'));
     }
 

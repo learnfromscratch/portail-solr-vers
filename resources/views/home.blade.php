@@ -7,14 +7,14 @@
 @endsection
 
 @section('content')
-@php //$params['language'] = session('language'); @endphp
+
     <div class="container-fluid">
         <div class="rechercher row">
              <div class="col-md-6 col-md-offset-3">
         
         <form class="search-form" role="search" action="{{ route('roots',$params) }}" method="get">
                 <div class="input-group search">
-                    <input type="text" value="{{array_key_exists('data',$params) ? $params['data'] : ''}}" name="data"
+                    <input type="text" value="{{ array_key_exists('data',$params) ? $params['data'] : '' }}" name="data"
                            id="data" placeholder="Recherche Initial" class="form-control input-lg" ng-model="name">
                     <button type='submit' class="input-group-addon w3-blue">
                         <i class="fa fa-search fa-fw" aria-hidden="true"></i>
@@ -28,7 +28,7 @@
 
                 
         </form>
-            <!--<h1>hello :{{session('language')}}</h1>!-->
+            
 
        
         </div>
@@ -92,21 +92,18 @@
                     <div class="modal-body">
                         
                             <div class="form-group">
-                                <label for="recipient-name" class="form-control-label">All these words:</label>
-                                <input data-role="tagsinput" type="text" class="form-control" id="recipient-name" name="allthiswords" value="{{array_key_exists('allthiswords',$params) ? $params['allthiswords'] : ''}}" placeholder='Sépare les mots par virgule (AND)'>
+                                <label for="recipient-name" class="form-control-label">Tous ces Mots :</label>
+                                <input data-role="tagsinput" type="text" class="form-control" id="recipient-name" name="allthiswords" value="{{ array_key_exists('allthiswords',$params) ? $params['allthiswords'] : '' }}" placeholder='Séparez les mots par virgule (AND)'>
                             </div>
+                            
                             <div class="form-group">
-                                <label for="message-text" class="form-control-label">This exact word or phrase:</label>
-                                <input type="text" class="form-control" name="phrase_search" id="recipient-name" placeholder='Put exact words in quotes: "rat terrier"'>
-                            </div>
-                            <div class="form-group">
-                                <label for="message-text" class="form-control-label">Any of these words:</label>
-            <input type="text" class="form-control " data-role="tagsinput" id="recipient-name" placeholder="Sépare les mots par virgule (OR)" name="orwords" value="{{array_key_exists('orwords',$params) ? $params['orwords'] : ''}}">
+                                <label for="message-text" class="form-control-label">L'un de ces mots:</label>
+            <input type="text" class="form-control " data-role="tagsinput" id="recipient-name" placeholder="Séparez les mots par virgule (OR)" name="orwords" value="{{ array_key_exists('orwords',$params) ? $params['orwords'] : '' }}">
                             </div>
 
                             <div class="form-group">
-                                <label for="message-text" class="form-control-label">None of these words:</label>
-                                <input type="text" data-role="tagsinput" class="form-control redtags" name="noneofthis" placeholder="Sépare les mots par virgule (exclut)" id="recipient-name" value="{{array_key_exists('noneofthis',$params) ? $params['noneofthis'] : ''}}">
+                                <label for="message-text" class="form-control-label">Aucun de ces mots:</label>
+                                <input type="text" data-role="tagsinput" class="form-control redtags" name="noneofthis" placeholder="Séparez les mots par virgule (les mots à exclure)" id="recipient-name" value="{{ array_key_exists('noneofthis',$params) ? $params['noneofthis'] : '' }}">
 
     
                             
@@ -163,14 +160,14 @@
 <!--
     <p>Active Filters : <i class="badge"  >English</i><i class="badge"  >Date <a href="#">x</a></i></p>
 -->     <div class="article-widget row">
-        <div class="widget {{App\Miseforme::where('user_id', Auth::id())->first()->nombre_sidebar == 2 ? 'col-md-3' : 'col-md-4'}} " style="background: {{App\Miseforme::where('user_id', Auth::id())->first()->color_widget}}">
-        <em class="number-articles">{{ __('Number of articles : ') }}<i>{{ $resultset->getNumFound() }} </i></em>
+        <div class="widget {{ App\Miseforme::where('user_id', Auth::id())->first()->nombre_sidebar == 2 ? 'col-md-3' : 'col-md-4' }} " style="background: {{ App\Miseforme::where('user_id', Auth::id())->first()->color_widget }}">
+        <em class="number-articles">Nombre d'articles : <i>{{ $resultset->getNumFound() }} </i></em>
         <div class="download-pdfs">
-            <form method="post" action="{{ route('articles.test')}}" >
+            <form method="post" action="{{ route('articles.test') }}" >
             {{ csrf_field() }}
-        <input type="hidden" name="pdf" value="{{serialize($pdfs)}}">
-        <input type="hidden" name="titles" value="{{serialize($titles)}}">
-        <input type="hidden" name="language" value="{{serialize($languages)}}">
+        <input type="hidden" name="pdf" value="{{ serialize($pdfs) }}">
+        <input type="hidden" name="titles" value="{{ serialize($titles) }}">
+        <input type="hidden" name="language" value="{{ serialize($languages) }}">
 
             <button type="submit"  class="w3-btn w3-green download" >{{ __('Exporter la page courante') }}</button>
             
@@ -207,12 +204,14 @@
                         @php $values = 'en'; @endphp
                     @elseif ($value == 'Arabic')
                         @php $values = 'ar'; @endphp
+                    @elseif ($value == 'FRENCH')
+                        @php $values = 'fr'; @endphp
                     @endif
                 @php $all = $all + $count; @endphp
                 @if(Request::segment(1) == $values)
 
                      <p class="actives">
-                    {{ $value}}
+                    {{ $value }}
                      
                      
                     </p>
@@ -221,11 +220,11 @@
 
                      
                     
-                    <a href="http://localhost/portail/public/{{$values}}">{{ $value}}<i>{{$count}}</i></a><br>
+                    <a href="/portail-solr-vers/public/{{ $values }}">{{ $value }}<i>{{ $count }}</i></a><br>
                 @endif
             @endforeach
              @if(Request::segment(1) != 'tous')
-                <a href="http://localhost/portail/public/tous">Tous<i>{{$all}}</i></a><br>
+                <a href="/portail-solr-vers/public/tous">Tous<i>{{ $all }}</i></a><br>
             @else
                 <p class="actives">
                     Tous
@@ -248,7 +247,7 @@
                
                 @if(isset($params['source']) AND $params['source'] == $value)
                 <p class="actives">
-                    {{ $value}}
+                    {{ $value }}
                      <a href="javascript:;" onclick="cancellink('source');"  class="closes">
                         <i class="fa fa-times-circle" aria-hidden="true"></i>
                      </a>
@@ -256,7 +255,7 @@
                     </p>
                     
                 @else
-                    <a href="{{ route('roots', $params)}}{{$sign}}source={{$value}}">{{ $value}}</a><i>{{$count}}</i><br>
+                    <a href="{{ route('roots', $params) }}{{ $sign }}source={{ $value }}">{{ $value }}</a><i>{{ $count }}</i><br>
                 @endif
             @endforeach
     </div>
@@ -282,11 +281,11 @@
             @php $today = date("Y-m-d"); @endphp
             @for($i = 0 ; $i < 5; $i++) 
                 @if($i == 0)
-                    <a href="{{ route('roots', $parameters) }}{{$signs}}fromdate={{$today}}"> Aujourd'hui</a><br>
+                    <a href="{{ route('roots', $parameters) }}{{ $signs }}fromdate={{ $today }}"> Aujourd'hui</a><br>
                 @elseif ($i == 1)
-                    <a href="{{ route('roots', $parameters) }}{{$signs}}fromdate={{date('Y-m-d', strtotime($today. '  -'.$i.' day' ))}}"> Hier</a><br>
+                    <a href="{{ route('roots', $parameters) }}{{ $signs }}fromdate={{ date('Y-m-d', strtotime($today. '  -'.$i.' day' )) }}"> Hier</a><br>
                 @else
-                    <a href="{{ route('roots', $parameters) }}{{$signs}}fromdate={{date('Y-m-d', strtotime($today. '  -'.$i.' day' ))}}"> {{date("d-m-Y", strtotime($today. "  -".$i." day" ))}}</a><br>
+                    <a href="{{ route('roots', $parameters) }}{{ $signs }}fromdate={{ date('Y-m-d', strtotime($today. '  -'.$i.' day' )) }}"> {{ date("d-m-Y", strtotime($today. "  -".$i." day" )) }}</a><br>
                      
                 @endif
                 
@@ -297,7 +296,7 @@
 
         <br>
         
-        <div style="display: {{App\Miseforme::where('user_id', Auth::id())->first()->nombre_sidebar == 2 ? 'none' : 'block'}}">
+        <div style="display: {{ App\Miseforme::where('user_id', Auth::id())->first()->nombre_sidebar == 2 ? 'none' : 'block' }}">
      <div class="themes">
         
     <h4>Themes</h4>
@@ -308,17 +307,25 @@
     @if ($count > 0)
        
         @if ( $size <= 100 and $size > 95)
-            @php $size = '35px'; @endphp
+            @php $size = '50px'; @endphp
         @elseif ( $size <= 95 and $size > 80)
-            @php $size = '28px'; @endphp
+            @php $size = '45px'; @endphp
         @elseif ( $size <= 80 and $size > 70)
-            @php $size = '21px'; @endphp
+            @php $size = '40px'; @endphp
         @elseif ( $size <= 70 and $size > 60)
-            @php $size = '17px'; @endphp
+            @php $size = '35px'; @endphp
+        @elseif ( $size <= 60 and $size > 50)
+            @php $size = '30px'; @endphp
+        @elseif ( $size <= 50 and $size > 40)
+            @php $size = '25px'; @endphp
+        @elseif ( $size <= 40 and $size > 30)
+            @php $size = '20px'; @endphp
+        @elseif ( $size <= 20 and $size > 10)
+            @php $size = '15px'; @endphp
         @else
-            @php $size = '10px'; @endphp
+            @php $size = '12px'; @endphp
         @endif
-        <a href="{{ route('roots', $parameters3) }}{{$signs3}}theme={{ $subject }}" style="font-size:{{$size}}">{{ $subject }}</a>
+        <span><a href="{{ route('roots', $parameters3) }}{{ $signs3 }}theme={{ $subject }}" style="font-size:{{ $size }}">{{ $subject }}</a> - </span>
     @endif 
     @endforeach
 
@@ -326,8 +333,8 @@
 
     <div class="calendrier">
         <h4>Calendrier</h4><br>
-            <form class="form-inline" method="get" action="{{ route('roots', $parameters)}}">
-               <input type="text" name="fromdate" class="form-control" id="dateinput" placeholder="Calendrier" value="{{$choixdate}}" >
+            <form class="form-inline" method="get" action="{{ route('roots', $parameters) }}">
+               <input type="text" name="fromdate" class="form-control" id="dateinput1" placeholder="Calendrier" value="{{ $choixdate }}" >
                 <button type="submit" class="btn btn-primary"><i class="fa fa-search fa-fw" aria-hidden="true"></i></button> 
 
             </form>
@@ -337,7 +344,7 @@
         </div>
         </div>
         
-<div class="articles {{App\Miseforme::where('user_id', Auth::id())->first()->nombre_sidebar == 2 ? 'col-md-6' : 'col-md-8'}}">
+<div class="articles {{ App\Miseforme::where('user_id', Auth::id())->first()->nombre_sidebar == 2 ? 'col-md-6' : 'col-md-8' }}">
 
 <div>
             <b>Filtre Active : </b>
@@ -352,7 +359,7 @@
                  @php $values = "Arabe"; @endphp    
             @endif
                 <div class="filters" style="display:inline-block;">
-                    <span class="param">Langage:{{$values}}</span>
+                    <span class="param">Langage:{{ $values }}</span>
                 </div>
             
             @foreach($params as $param => $value)
@@ -365,7 +372,7 @@
                         @if($param == 'page') 
                             @php $value = Request::input('page'); @endphp
                         @endif
-                            <span class="param">{{$param}}:</span>  {{$value }}  <a href="javascript:;" onclick="cancellink('{{$param}}');"  class="closes">
+                            <span class="param">{{ $param }}:</span>  {{ $value }}  <a href="javascript:;" onclick="cancellink('{{ $param }}');"  class="closes">
                                 <i class="fa fa-times-circle" aria-hidden="true"></i>
                              </a>
                         </div>
@@ -376,9 +383,9 @@
 <!--
 <form class="search-form form-date" role="search" action="{{ route('roots') }}" method="get">
     <div class="input-daterange input-group ranges" id="datepicker">
-        <input type="text" name="fromdate" class="input-sm form-control" value="{{array_key_exists('fromdate',$params) ? $params['fromdate'] : ''}}"  placeholder="Date du Debut" />
+        <input type="text" name="fromdate" class="input-sm form-control" value="{{ array_key_exists('fromdate',$params) ? $params['fromdate'] : '' }}"  placeholder="Date du Debut" />
         <span class="input-group-addon">to</span>
-        <input type="text" name="todate" class="input-sm form-control" placeholder="Date du Fin" value="{{array_key_exists('todate',$params) ? $params['todate'] : ''}}"/>
+        <input type="text" name="todate" class="input-sm form-control" placeholder="Date du Fin" value="{{ array_key_exists('todate',$params) ? $params['todate'] : '' }}"/>
     </div>
      
      <button class="btn btn-primary input-date"><i class="fa fa-search fa-fw" aria-hidden="true"></i></button>
@@ -428,26 +435,26 @@
                 @endif
                     <div class="row w3-margin-bottom">
                               
-                        <div class="media {{$class}}">
+                        <div class="media {{ $class }}">
                           <div class="media-left">
                             <img src="{{ asset('img/paper.png') }}" class="media-object" style="width:90px">
                           </div>
                           <div class="media-body">
                          
+                            
+                            
+                            @if($class == 'arabic' )
+                            <div style="font-family: 'Amiri', serif; line-height: 1.5;font-size: 18px;">
                             <h4 class="media-heading w3-xlarge">
-                            <a href="{{ route('articles.show', ['id' => $document->id]) }}">
+                            <a style="font-family: 'Lateef', serif; " href="{{ route('articles.show', ['id' => $document->id]) }}">
                                 {!! (count($highlightedDoc->getField($field))) ? implode(' ... ', $highlightedDoc->getField($field)) : $title !!}
                                 
                             </a>
 
                             </h4>
-                            @if($class == 'arabic' )
-                                <i>{{ $date }} </i> نشر في 
-                            @else
-                                <i>{{ __('Published on ') }}{{ $date }}</i>
-                            @endif
-                            @if($class == 'arabic' )
-                            <p>
+                            
+                             <i>{{ $date }} </i> نشر في 
+                            <p >
                            
                                 {!! (count($highlightedDoc->getField('Fulltext'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext')) : substr($document->Fulltext,0,250) !!}
                                 {!! (count($highlightedDoc->getField('Fulltext_en'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_en')) : substr($document->Fulltext_en,0,250) !!}
@@ -456,14 +463,29 @@
                             </p>
                              
                             
-                                <span class="description"> : المصدر</span> <i><a href="{{ route('roots', $params)}}{{$sign}}source={{$document->SourceName}}">{{ $document->SourceName }}</a></i><br>
+                                <span class="description"> : المصدر</span> <i><a href="{{ route('roots', $params) }}{{ $sign }}source={{ $document->SourceName }}">{{ $document->SourceName }}</a></i><br>
                                 
-                                 <span class="description"> : الكاتب</span> <i><a href="{{ route('roots', $params)}}{{$sign}}author={{$document->Author }}">{{ $document->Author }}</a></i>  
+                                 <span class="description"> : الكاتب</span> 
+                                @if(!empty($document->Author))
+                                 <i><a href="{{ route('roots', $params) }}{{ $sign }}author={{ $document->Author }}">{{ $document->Author }}</a></i>
+                                @else
+
+                                <i>غير محدد</i>   
+                                @endif
                                 @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
                                     <br><i> {{ $document->score }} : التنقيط</i>
                                 @endif
                                 <br><a href="{{ $pdf1 }}" target="_blank" class="w3-btn w3-green">عرض الملف</a>
+                            </div>
                             @else
+                            <h4 class="media-heading w3-xlarge">
+                            <a  href="{{ route('articles.show', ['id' => $document->id]) }}">
+                                {!! (count($highlightedDoc->getField($field))) ? implode(' ... ', $highlightedDoc->getField($field)) : $title !!}
+                                
+                            </a>
+
+                            </h4>
+                             <i>Publié le : {{ $date }}</i>
                             <p>
                            
                                 {!! (count($highlightedDoc->getField('Fulltext'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext')) : substr($document->Fulltext,0,250) !!}
@@ -471,13 +493,18 @@
                                 {!! (count($highlightedDoc->getField('Fulltext_fr'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_fr')) : substr($document->Fulltext_fr,0,250) !!}
                                 {!! (count($highlightedDoc->getField('Fulltext_ar'))) ? implode(' ... ', $highlightedDoc->getField('Fulltext_ar')) : substr($document->Fulltext_ar,0,250) !!}  <a href="{{ route('articles.show', ['id' => $document->id]) }}" >Voir la suite ... </a>
                             </p>
-                                <i>{{ __('Source : ') }}<a href="{{ route('roots', $params)}}{{$sign}}source={{$document->SourceName}}">{{ $document->SourceName }}</a></i><br>
+                                <i>Source : <a href="{{ route('roots', $params) }}{{ $sign }}source={{ $document->SourceName }}">{{ $document->SourceName }}</a></i><br>
                                 
-                                <i>{{ __('Author : ') }}<a href="{{ route('roots', $params)}}{{$sign}}author={{$document->Author }}">{{ $document->Author }}</a></i>
-                                @if(!empty($params['data']) OR !empty($params['noneofthis']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
+                                <i>Auteur : 
+                                @if(!empty($document->Author))
+                                <a href="{{ route('roots', $params) }}{{ $sign }}author={{ $document->Author }}">{{ $document->Author }}</a></i>
+                                @else
+                                <span>Non spécifié</span></i>
+                                @endif
+                                @if(!empty($params['data']) OR !empty($params['allthiswords']) OR !empty($params['orwords']))
                                     <br><i>Score {{ $document->score }}</i>
                                 @endif
-                                <br><a href="{{ $pdf1 }}" target="_blank" class="w3-btn w3-green">{{ __('View PDF') }}</a>
+                                <br><a href="{{ $pdf1 }}" target="_blank" class="w3-btn w3-green">Voir le PDF</a>
                             @endif
                             
                           
@@ -546,10 +573,10 @@
 
                 @if($request->page == $i)
                     <li class="page-item active">
-                        <a class="page-link" href="#">{{$i}} <span class="page-link sr-only">(current)</span></a>
+                        <a class="page-link" href="#">{{ $i }} <span class="page-link sr-only">(current)</span></a>
                     </li>
                 @else 
-                    <li><a href="{{ route('roots', $params) }}">{{$i}}</a></li>
+                    <li><a href="{{ route('roots', $params) }}">{{ $i }}</a></li>
                 @endif
 
         @endfor
@@ -568,7 +595,7 @@
     
     
    
-    <div class="widget1 col-md-3" style="background: {{App\Miseforme::where('user_id', Auth::id())->first()->color_widget}}; display: {{App\Miseforme::where('user_id', Auth::id())->first()->nombre_sidebar == 2 ? 'block' : 'none'}}">
+    <div class="widget1 col-md-3" style="background: {{ App\Miseforme::where('user_id', Auth::id())->first()->color_widget }}; display: {{ App\Miseforme::where('user_id', Auth::id())->first()->nombre_sidebar == 2 ? 'block' : 'none' }}">
 
        <div class="themes">
         
@@ -590,7 +617,7 @@
         @else
             @php $size = '10px'; @endphp
         @endif
-        <a href="{{ route('roots', $parameters3) }}{{$signs3}}theme={{ $subject }}" style="font-size:{{$size}}">{{ $subject }}</a>
+        <a href="{{ route('roots', $parameters3) }}{{ $signs3 }}theme={{ $subject }}" style="font-size:{{ $size }}">{{ $subject }}</a>
     @endif 
     @endforeach
 
@@ -598,8 +625,8 @@
 
     <div class="calendrier">
         <h4>Calendrier</h4><br>
-            <form class="form-inline" method="get" action="{{ route('roots', $parameters)}}">
-               <input type="text" name="fromdate" class="form-control" id="dateinput" placeholder="Calendrier" value="{{$choixdate}}" >
+            <form class="form-inline" method="get" action="{{ route('roots', $parameters) }}">
+               <input type="text" name="fromdate" class="form-control" id="dateinput" placeholder="Calendrier" value="{{ $choixdate }}" >
                 <button type="submit" class="btn btn-primary"><i class="fa fa-search fa-fw" aria-hidden="true"></i></button> 
 
             </form>
@@ -613,10 +640,9 @@
 
 
 
-      <!-- <h1>{{memory_get_peak_usage() / 1024 / 1024 }}' MB RAM'</h1> -->
+      <!-- <h1>{{ memory_get_peak_usage() / 1024 / 1024 }}' MB RAM'</h1> -->
     </div>
-    <script type="text/javascript" src="{{ asset('js/system.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/pdfjs.js') }}"></script>
+    
 <script>
 
 
