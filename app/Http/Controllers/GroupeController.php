@@ -29,6 +29,7 @@ class GroupeController extends Controller
     public function index()
     {
         $groupes = Groupe::where('id', '<>', 1)->orderBy('updated_at', 'desc')->get();
+        //dd($groupes);
 
         return view('admin.groupes', compact('groupes'));
     }

@@ -43,6 +43,7 @@
 						</tr>
 					</thead>
 					<tbody>
+					
 						@foreach ($groupes as $groupe)
 							<tr>
 								<td>

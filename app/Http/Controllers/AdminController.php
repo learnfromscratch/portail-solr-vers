@@ -29,6 +29,7 @@ class AdminController extends Controller
     }
 
     public function theme(){
+        
         return view('admin.theme');
     }
 
