@@ -62,7 +62,7 @@ class notifylaravel extends Command
             {  
                 //sleep(1);         
                 $xml=simplexml_load_file($path) or die("Error: Cannot create object");
-
+                //dd($xml);
                 $i = 0;
                 foreach($xml->Record->Field as $keys => $value) {
                     $key = (string) $xml->Record->Field[$i]['name'];
@@ -133,7 +133,7 @@ class notifylaravel extends Command
                             array_push($arr, $key);
                     }
 
-                    dd($arr);
+                    //dd($arr);
                      //\Mail::to('admin@oxdata.ma')->send(new ErrorMails($path));
 
                 }

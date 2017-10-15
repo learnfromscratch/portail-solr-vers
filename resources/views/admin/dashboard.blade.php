@@ -69,78 +69,13 @@
 				</div>
 			</div>
 
-			<div class="row">
-				<div class="col-md-9">
-					<canvas id="myChart"></canvas>
-				</div>
-				<div class="col-md-3">
-					<div class="weekly-summary text-right">
-						<span class="number"></span> <span class="percentage"><i class="fa fa-caret-up text-success"></i> </span>
-						<span class="info-label"></span>
-					</div>
-					<div class="weekly-summary text-right">
-						<span class="number"></span> <span class="percentage"><i class="fa fa-caret-up text-success"></i></span>
-						<span class="info-label"></span>
-					</div>
-					<div class="weekly-summary text-right">
-						<span class="number"></span> <span class="percentage"><i class="fa fa-caret-down text-danger"></i></span>
-						<span class="info-label"></span>
-					</div>
-				</div>
-			</div>
+			
 
 		</div>
 	</div>
 	<!-- FIN VUE D'ENSEMBLE -->
 
-	<div class="row">
-		<div class="col-md-7">
-			<!-- TODO LIST -->
-			<div class="panel">
-				<div class="panel-heading">
-					<h3 class="panel-title">Liste de choses à faire</h3>
-					<div class="right">
-						<button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
-						<button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
-					</div>
-				</div>
-				<div class="panel-body">
-					<ul class="list-unstyled todo-list">
-						<li>
-							<label class="control-inline fancy-checkbox">
-								<input type="checkbox"><span></span>
-							</label>
-							<p>
-								<span class="title">Indexation</span>
-								<span class="short-description">Indexer les articles qui viennent d'être ajouté.</span>
-								<span class="date">Oct 9, 2016</span>
-							</p>
-							<div class="controls">
-								<a href="#"><i class="icon-software icon-software-pencil"></i></a> <a href="#"><i class="icon-arrows icon-arrows-circle-remove"></i></a>
-							</div>
-						</li>
-					</ul>
-				</div>
-			</div>
-			<!-- END TODO LIST -->
-		</div>
-		<div class="col-md-5">
-			<!-- TIMELINE -->
-			<div class="panel panel-scrolling">
-				<div class="panel-heading">
-					<h3 class="panel-title">Actions</h3>
-					<div class="right">
-						<button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
-						<button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
-					</div>
-				</div>
-				<div class="panel-body">
-					<a href="{{ route('admin.indexing') }}" type="button" class="btn btn-primary btn-right center-block">Indexer les articles</a> <br>
-				</div>
-			</div>
-			<!-- END TIMELINE -->
-		</div>
-	</div>
+	
 @endsection
 
 @section('javascript')

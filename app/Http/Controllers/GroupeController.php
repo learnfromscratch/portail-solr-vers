@@ -82,18 +82,20 @@ class GroupeController extends Controller
             'end_date' => $request['end_date'],
             'groupe_id' => $groupe->id,
             ]);
+         $user = new User();
+        $user->name = $request['name'];
+        $user->email = $request['email'];
+        $user->password = bcrypt($request['password']);
+        $user->groupe_id = $groupe->id;
+        $user->sous_groupe_id = $sousgroupe;
+        $user->role_id = 2;
+        $user->save();
+       
 
-        User::insert([
-            'name' => $request['name'],
-            'email' => $request['email'],
-            'password' => bcrypt($request['password']),
-            'groupe_id' => $groupe->id,
-            'sous_groupe_id' => $sousgroupe,
-            'role_id' => 2,
-        ]);
+        //dd($user->id);
 
         Miseforme::insert([
-            'user_id' => $groupe->id,
+            'user_id' => $user->id,
             'nombre_sidebar'=> 2,
             'article_par_page' => 5,
             'color_background' => '#f5f8fa',
@@ -101,7 +103,7 @@ class GroupeController extends Controller
         ]);
 
         Newsletter::insert([
-            'user_id' => $groupe->id,
+            'user_id' => $user->id,
             'email' => $request['email'],
             'periode_newslettre' => 'chaque jour',
             'date_envoie_newslettre' => '2017-09-13',

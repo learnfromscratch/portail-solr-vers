@@ -10,6 +10,9 @@ use App\Abonnement;
 use App\Keyword;
 use App\Newsletter;
 use App\Miseforme;
+use App\Groupe;
+use Illuminate\Support\Facades\Auth;
+
 class RegisterController extends Controller
 {
     /*
@@ -30,7 +33,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/users/all';
+    //protected $redirectTo = '/users/all';
 
     /**
      * Create a new controller instance.
@@ -66,6 +69,13 @@ class RegisterController extends Controller
     public function create(array $data)
     {
         //dd($data);
+        $user = Auth::user();
+        $groupe = Groupe::find($user->groupe_id);
+        $users = count(User::all()->where('groupe_id', $user->groupe_id));
+        if ($groupe->nbrUser > $users or $user->role_id = 1) {
+
+        //dd($user);
+        //$user->groupe->nbr_usr = 
         if(empty($data['sous_groupe_id']))
             $sousgroupe = NULL;
         else
@@ -105,6 +115,6 @@ class RegisterController extends Controller
         // }
 
         //return $user;
-
+        }
     }
 }

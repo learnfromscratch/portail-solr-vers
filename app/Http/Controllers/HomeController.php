@@ -30,7 +30,7 @@ class HomeController extends Controller
     {
         $this->middleware('auth');
          $this->middleware('language');
-        //$this->middleware('abonnement');
+        $this->middleware('abonnement');
         $this->client = $client;
         
     }

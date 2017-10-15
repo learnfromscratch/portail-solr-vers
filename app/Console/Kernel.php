@@ -18,9 +18,6 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\SendNewsletters::class,
-        Commands\notify::class,
-        Commands\redisub::class,
         Commands\notifylaravel::class,
         Commands\DailyNews::class
     ];

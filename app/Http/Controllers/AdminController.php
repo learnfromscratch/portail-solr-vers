@@ -13,17 +13,21 @@ class AdminController extends Controller
 {
     protected $client;
 
-    public function __construct()
+    public function __construct(\Solarium\Client $client)
     {
         $this->middleware('auth');
     	$this->middleware('admin');
+        $this->client = $client;
     }
 
-    public function index(\Solarium\Client $client)
+    public function index()
     {
         $nbrUser = count(User::where('groupe_id', '<>', 1)->get());
         $nbrGroupe = count(Groupe::where('id', '<>', 1)->get());
-        $indexed = (new Solarium($client))->indexed();
+            $query = $this->client->createSelect();
+            $query->setQuery('*:*');
+            $resultset = $this->client->select($query);            
+            $indexed = $resultset->getNumFound();
         $nbrKeyword = count(Keyword::all());
     	return view('admin.dashboard', compact('nbrGroupe', 'nbrUser', 'indexed', 'nbrKeyword'));
     }

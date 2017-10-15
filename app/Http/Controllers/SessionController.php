@@ -12,11 +12,17 @@ class SessionController extends Controller
     public function create() {
     	return view('auth.login');
     }
-    public function store() {
-    	if (!auth()->attempt(request(['email','password']))) {
-    		return back();
+    public function store(Request $request) {
+
+        $this->validateLogin($request);
+    	
+        if (!auth()->attempt(request(['email','password']))) {
+    		 return $this->validate($request, [
+            'email' => 'required|string',
+            'password' => 'required|string',
+        ]);
     	} 
-         session(['language' => request('language')]);
+         //session(['language' => request('language')]);
     	//dd(request('lang'));
     	return redirect('/'.request('language'));
     }
